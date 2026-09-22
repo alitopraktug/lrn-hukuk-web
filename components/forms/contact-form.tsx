@@ -20,7 +20,7 @@ type Props = {
 function ConsentLabel({ label }: { label: string }) {
   const m = label.match(/^([\s\S]*?)\{\{(.+?)\}\}([\s\S]*)$/);
   const link = (text: string) => (
-    <Link href="/kvkk" target="_blank" className="text-forest underline underline-offset-4">
+    <Link href="/kvkk" target="_blank" className="text-wine underline underline-offset-4">
       {text}
     </Link>
   );
@@ -58,7 +58,7 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
 
   if (state.status === "success") {
     return (
-      <div role="status" className="border border-forest/30 bg-surface p-8 sm:p-10">
+      <div role="status" className="border border-wine/30 bg-surface p-8 sm:p-10">
         <p className="font-serif text-3xl leading-tight">Mesajınız iletildi.</p>
         <p className="mt-4 text-[1.02rem] leading-relaxed text-quiet">{state.message}</p>
         <button
@@ -203,7 +203,7 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
             type="checkbox"
             defaultChecked={values.consent === "on"}
             required
-            className="mt-1 h-5 w-5 shrink-0 accent-forest"
+            className="mt-1 h-5 w-5 shrink-0 accent-wine"
             {...field("consent")}
           />
           <label htmlFor="consent" className="text-[0.95rem] leading-relaxed">

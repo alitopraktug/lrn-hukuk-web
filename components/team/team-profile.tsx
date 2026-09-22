@@ -70,12 +70,12 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
           {email || linkedin ? (
             <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[0.97rem]">
               {email ? (
-                <a href={`mailto:${email}`} className="text-forest underline underline-offset-4 hover:text-wine">
+                <a href={`mailto:${email}`} className="text-wine underline underline-offset-4 hover:text-wine">
                   {email}
                 </a>
               ) : null}
               {linkedin ? (
-                <a href={linkedin} target="_blank" rel="noopener noreferrer" className="text-forest underline underline-offset-4 hover:text-wine">
+                <a href={linkedin} target="_blank" rel="noopener noreferrer" className="text-wine underline underline-offset-4 hover:text-wine">
                   LinkedIn
                 </a>
               ) : null}
@@ -116,7 +116,7 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
               <ul className="flex flex-wrap gap-x-6 gap-y-3">
                 {areas.map((a) => (
                   <li key={a.id}>
-                    <Link href={`/calisma-alanlari/${a.slug}`} className="text-[1.02rem] text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">
+                    <Link href={`/calisma-alanlari/${a.slug}`} className="text-[1.02rem] text-wine underline decoration-wine/30 underline-offset-4 hover:decoration-wine">
                       {a.title}
                     </Link>
                   </li>

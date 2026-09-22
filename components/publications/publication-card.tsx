@@ -28,12 +28,12 @@ export function PublicationCard({ pub, showCover = false }: { pub: PublicationCa
         {pub.featured ? (
           <>
             <span aria-hidden="true">·</span>
-            <span className="font-semibold text-forest">Öne çıkan</span>
+            <span className="font-semibold text-wine">Öne çıkan</span>
           </>
         ) : null}
       </div>
       <h3 className="mt-3 font-serif text-[1.65rem] leading-[1.15] sm:text-[1.8rem]">
-        <Link href={href} className="transition-colors group-hover:text-forest">
+        <Link href={href} className="transition-colors group-hover:text-wine">
           {pub.title}
         </Link>
       </h3>

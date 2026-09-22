@@ -26,7 +26,7 @@ export function TeamCard({ member, priority }: { member: TeamCardData; priority?
       </Link>
       <div className="flex flex-1 flex-col pt-5">
         <h3 className="font-serif text-[1.6rem] leading-tight">
-          <Link href={`/ekibimiz/${member.slug}`} className="transition-colors hover:text-forest">
+          <Link href={`/ekibimiz/${member.slug}`} className="transition-colors hover:text-wine">
             {member.fullName}
           </Link>
         </h3>

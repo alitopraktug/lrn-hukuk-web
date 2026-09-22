@@ -30,10 +30,11 @@ export function Footer({ settings }: { settings: SiteSettingsView }) {
   return (
     <footer data-site-footer className="on-dark bg-ink text-background">
       <Container className="pb-8 pt-16 sm:pt-20 lg:pt-24">
-        <div className="grid grid-cols-12 md:gap-x-8 gap-y-12">
+        <Logo logo={settings.logo} firmName={settings.firmName} variant="stacked" tone="light" height={76} className="opacity-95" />
+
+        <div className="mt-14 grid grid-cols-12 border-t border-background/15 pt-14 md:gap-x-8 gap-y-12 sm:mt-16 lg:mt-20">
           <div className="col-span-12 lg:col-span-5">
-            <Logo logo={settings.logo} firmName={settings.firmName} tone="light" height={44} />
-            <p className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-background/70">{settings.footerText}</p>
+            <p className="max-w-md text-[0.95rem] leading-relaxed text-background/70">{settings.footerText}</p>
           </div>
 
           <nav aria-label="Hızlı bağlantılar" className="col-span-6 lg:col-span-2">

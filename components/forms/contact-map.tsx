@@ -23,7 +23,7 @@ export function ContactMap({ embedUrl, linkHref }: { embedUrl: string | null; li
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center">
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.2" className="text-forest">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.2" className="text-wine">
               <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />
               <circle cx="12" cy="9.5" r="2.5" />
             </svg>

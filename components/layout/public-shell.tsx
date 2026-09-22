@@ -13,7 +13,7 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
     <>
       <a
         href="#icerik"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-forest focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-background"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-wine focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-background"
       >
         İçeriğe geç
       </a>

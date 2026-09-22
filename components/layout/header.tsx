@@ -19,9 +19,10 @@ function isActive(pathname: string, href: string) {
 }
 
 /**
- * Sade, yapışkan gezinme. Kaydırıldığında hafif arka plan bulanıklığı + ince alt çizgi belirir.
- * Mobil menü, yerel <dialog> ile yapılır: odak tuzağı, Esc ile kapanma, arka planı devre dışı bırakma ve
- * odağı tetikleyiciye geri verme tarayıcı tarafından sağlanır; gövde kaydırması CSS ile kilitlenir (globals.css).
+ * Sade, yapışkan gezinme. Sayfa başında saydam (hero ile kaynaşır); kaydırılınca ivory zemin +
+ * ince alt çizgi belirir. Bulanıklık/cam efekti yok. Mobil menü, yerel <dialog> ile yapılır: odak
+ * tuzağı, Esc ile kapanma, arka planı devre dışı bırakma ve odağı tetikleyiciye geri verme tarayıcı
+ * tarafından sağlanır; gövde kaydırması CSS ile kilitlenir (globals.css).
  */
 export function Header({
   logo,
@@ -66,11 +67,11 @@ export function Header({
         data-site-header
         data-scrolled={scrolled || undefined}
         className={cn(
-          "sticky top-0 z-40 w-full border-b transition-[background-color,border-color,backdrop-filter] duration-300",
-          scrolled ? "border-line bg-background/85 backdrop-blur-md" : "border-transparent bg-background",
+          "sticky top-0 z-40 w-full border-b transition-[background-color,border-color] duration-300",
+          scrolled ? "border-line bg-background" : "border-transparent bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-16 w-full max-w-[1320px] items-center justify-between gap-6 px-5 sm:px-8 md:h-[var(--header-h)] lg:px-12">
+        <div className="mx-auto flex h-16 w-full max-w-[1380px] items-center justify-between gap-6 px-5 sm:px-8 md:h-[var(--header-h)] lg:px-12">
           <Link href="/" aria-label="LRN Hukuk – Ana Sayfa" className="-ml-1 flex shrink-0 items-center p-1">
             {logo}
           </Link>
@@ -117,7 +118,7 @@ export function Header({
         }}
         className="m-0 h-dvh max-h-none w-full max-w-none flex-col bg-background p-0 text-foreground open:flex"
       >
-        <div className="mx-auto flex h-16 w-full max-w-[1320px] shrink-0 items-center justify-between px-5 sm:px-8">
+        <div className="mx-auto flex h-16 w-full max-w-[1380px] shrink-0 items-center justify-between px-5 sm:px-8">
           <Link href="/" className="-ml-1 flex items-center p-1" onClick={() => dialogRef.current?.close()} aria-label="LRN Hukuk – Ana Sayfa">
             {menuLogo}
           </Link>
@@ -134,7 +135,7 @@ export function Header({
           </button>
         </div>
 
-        <nav aria-label="Mobil gezinme" className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col justify-center overflow-y-auto px-5 py-8 sm:px-8">
+        <nav aria-label="Mobil gezinme" className="mx-auto flex w-full max-w-[1380px] flex-1 flex-col justify-center overflow-y-auto px-5 py-8 sm:px-8">
           <ul className="divide-y divide-line border-y border-line">
             {NAV_ITEMS.map((item, i) => (
               <li key={item.href}>
@@ -142,7 +143,7 @@ export function Header({
                   href={item.href}
                   onClick={() => dialogRef.current?.close()}
                   aria-current={isActive(pathname, item.href) ? "page" : undefined}
-                  className="flex items-baseline gap-5 py-4 font-serif text-[1.9rem] leading-tight transition-colors hover:text-forest aria-[current=page]:text-forest sm:text-4xl"
+                  className="flex items-baseline gap-5 py-4 font-serif text-[1.9rem] leading-tight transition-colors hover:text-wine aria-[current=page]:text-wine sm:text-4xl"
                 >
                   <span className="index-num w-6 shrink-0 text-base">{String(i + 1).padStart(2, "0")}</span>
                   {item.label}
@@ -153,14 +154,14 @@ export function Header({
         </nav>
 
         {contact.phone || contact.email ? (
-          <div className="mx-auto w-full max-w-[1320px] shrink-0 px-5 pb-8 text-sm text-quiet sm:px-8">
+          <div className="mx-auto w-full max-w-[1380px] shrink-0 px-5 pb-8 text-sm text-quiet sm:px-8">
             {contact.phone ? (
-              <a href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`} className="mr-6 inline-block py-1 hover:text-forest">
+              <a href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`} className="mr-6 inline-block py-1 hover:text-wine">
                 {contact.phone}
               </a>
             ) : null}
             {contact.email ? (
-              <a href={`mailto:${contact.email}`} className="inline-block py-1 hover:text-forest">
+              <a href={`mailto:${contact.email}`} className="inline-block py-1 hover:text-wine">
                 {contact.email}
               </a>
             ) : null}

@@ -33,33 +33,24 @@ export default async function HomePage() {
   ]);
   const d = page.data;
   const a = aboutPage.data;
-  const principles = [1, 2, 3, 4].map((i) => ({ title: a[`principle${i}Title`], text: a[`principle${i}Text`] }));
-  const processSteps = [1, 2, 3].map((i) => ({ title: d[`process${i}Title`], text: d[`process${i}Text`] }));
+  const approachRows = [1, 2, 3, 4].map((i) => ({ title: a[`principle${i}Title`], text: a[`principle${i}Text`] }));
 
-  // Bölüm numaraları ve zemin tonu, gösterilen bölümlere göre ardışık verilir.
+  // Bölüm numaraları, gösterilen bölümlere göre ardışık verilir. Mimari ara (fotoğraf) ve koyu
+  // bölümler kendi görsel ritimleri olduğu için numaralandırma sistemine dahil edilmez.
   let n = 0;
   const next = () => pad2(++n);
-  let t = 0;
-  const tone = (): "default" | "surface" => (t++ % 2 === 0 ? "surface" : "default");
-
   const aboutIndex = next();
   const areasIndex = next();
-  const areasTone = tone();
-  const principlesIndex = next();
-  const principlesTone = tone();
+  const approachIndex = next();
   const teamIndex = team.length > 0 ? next() : null;
-  const teamTone = team.length > 0 ? tone() : undefined;
-  const processIndex = next();
-  const processTone = tone();
   const pubsIndex = next();
-  const pubsTone = tone();
   const contactIndex = next();
 
   return (
     <>
       <Hero eyebrow={d.heroEyebrow} title={d.heroTitle} lead={d.heroLead} primaryLabel={d.heroPrimaryCta} secondaryLabel={d.heroSecondaryCta} />
 
-      {/* Hakkımızda özeti */}
+      {/* 03 · Hakkımızda / giriş */}
       <Section labelledBy="about-title">
         <Container>
           <div className="grid grid-cols-12 md:gap-x-8 gap-y-10">
@@ -68,12 +59,12 @@ export default async function HomePage() {
               <span aria-hidden="true" className="h-px w-10 bg-wine/60 lg:w-8" />
               <span className="eyebrow">{d.aboutEyebrow}</span>
             </div>
-            <div className="reveal col-span-12 lg:col-span-5">
+            <div className="col-span-12 lg:col-span-5">
               <h2 id="about-title" className="display-lg">
                 {d.aboutTitle}
               </h2>
             </div>
-            <div className="reveal col-span-12 space-y-5 text-[1.02rem] leading-[1.8] text-quiet lg:col-span-4 lg:pt-3">
+            <div className="col-span-12 space-y-5 text-[1.02rem] leading-[1.8] text-quiet lg:col-span-4 lg:pt-3">
               {splitParagraphs(d.aboutBody).map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
@@ -85,99 +76,88 @@ export default async function HomePage() {
         </Container>
       </Section>
 
-      {/* Çalışma alanları */}
-      <Section labelledBy="areas-title" tone={areasTone}>
+      {/* 04 · Mimari ara — gerçek ofis/mimari fotoğrafı eklenene kadarki yer tutucu (bkz. README) */}
+      <ArchitecturalBreak />
+
+      {/* 05 · Çalışma alanları — editoryal satırlar (kart ızgarası değil) */}
+      <Section labelledBy="areas-title" tone="surface">
         <Container>
-          <div className="reveal">
-            <SectionHeader
-              index={areasIndex}
-              eyebrow="Çalışma Alanlarımız"
-              id="areas-title"
-              title={d.practiceTitle}
-              intro={d.practiceIntro}
-              action={<LinkArrow href="/calisma-alanlari">Tümünü gör</LinkArrow>}
-            />
-          </div>
+          <SectionHeader
+            index={areasIndex}
+            eyebrow="Çalışma Alanlarımız"
+            id="areas-title"
+            title={d.practiceTitle}
+            intro={d.practiceIntro}
+            action={<LinkArrow href="/calisma-alanlari">Tümünü gör</LinkArrow>}
+          />
           <div className="mt-12 lg:mt-16">
             {areas.length ? <PracticeAreaList areas={areas} /> : <EmptyState title="Çalışma alanları yakında yayımlanacaktır." />}
           </div>
         </Container>
       </Section>
 
-      {/* İlkelerimiz — Hakkımızda sayfasındaki ilkelerin özeti (iddia/övgü değil, çalışma ilkesi) */}
-      <Section labelledBy="principles-title" tone={principlesTone}>
+      {/* 06 · Çalışma Yaklaşımımız — sitedeki tek büyük koyu bölümlerden biri */}
+      <Section labelledBy="approach-title" tone="dark">
         <Container>
-          <div className="reveal">
-            <SectionHeader index={principlesIndex} eyebrow="Yaklaşımımız" id="principles-title" title={a.principlesTitle} />
+          <div className="grid grid-cols-12 md:gap-x-8 gap-y-14">
+            <div className="col-span-12 lg:col-span-6">
+              <div className="flex items-center gap-4">
+                <span className="index-num !text-background/70">{approachIndex}</span>
+                <span aria-hidden="true" className="h-px w-10 bg-background/40" />
+                <span className="eyebrow">Yaklaşımımız</span>
+              </div>
+              <p id="approach-title" className="display-lg mt-7 max-w-xl">
+                {d.approachStatement}
+              </p>
+            </div>
+            <div className="col-span-12 lg:col-span-6 lg:pt-2">
+              <ul className="divide-y divide-background/15 border-t border-background/15">
+                {approachRows.map((r, i) => (
+                  <li key={i} className="flex flex-col gap-1.5 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+                    <span className="font-serif text-[1.5rem] leading-tight text-background">{r.title}</span>
+                    <span className="max-w-sm text-[0.92rem] leading-relaxed text-background/65">{r.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <ul className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
-            {principles.map((p, i) => (
-              <li key={i} className="reveal border-t border-foreground/25 pt-5">
-                <span className="index-num">{pad2(i + 1)}</span>
-                <h3 className="mt-4 font-serif text-[1.7rem] leading-tight">{p.title}</h3>
-                <p className="mt-3 text-[0.97rem] leading-relaxed text-quiet">{p.text}</p>
-              </li>
-            ))}
-          </ul>
         </Container>
       </Section>
 
-      {/* Ekip — yalnızca yayında en az bir profil varsa */}
+      {/* 07 · Ekip — yalnızca yayında en az bir profil varsa */}
       {teamIndex ? (
-        <Section labelledBy="team-title" tone={teamTone}>
+        <Section labelledBy="team-title">
           <Container>
-            <div className="reveal">
-              <SectionHeader
-                index={teamIndex}
-                eyebrow="Ekibimiz"
-                id="team-title"
-                title={d.teamTitle}
-                intro={d.teamIntro}
-                action={<LinkArrow href="/ekibimiz">Tüm ekip</LinkArrow>}
-              />
-            </div>
+            <SectionHeader
+              index={teamIndex}
+              eyebrow="Ekibimiz"
+              id="team-title"
+              title={d.teamTitle}
+              intro={d.teamIntro}
+              action={<LinkArrow href="/ekibimiz">Tüm ekip</LinkArrow>}
+            />
             <TeamGrid members={team} className="mt-12 lg:mt-16" />
           </Container>
         </Section>
       ) : null}
 
-      {/* Çalışma şeklimiz — süreç adımları (sonuç vaadi/garanti içermez) */}
-      <Section labelledBy="process-title" tone={processTone}>
+      {/* 08 · Yayınlar */}
+      <Section labelledBy="pubs-title" tone="surface">
         <Container>
-          <div className="reveal">
-            <SectionHeader index={processIndex} eyebrow="Süreç" id="process-title" title={d.processTitle} intro={d.processIntro} />
-          </div>
-          <ol className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-3 lg:mt-16">
-            {processSteps.map((s, i) => (
-              <li key={i} className="reveal border-t border-foreground/25 pt-5">
-                <span className="index-num">{pad2(i + 1)}</span>
-                <h3 className="mt-4 font-serif text-[1.7rem] leading-tight">{s.title}</h3>
-                <p className="mt-3 text-[0.97rem] leading-relaxed text-quiet">{s.text}</p>
-              </li>
-            ))}
-          </ol>
-        </Container>
-      </Section>
-
-      {/* Yayınlar */}
-      <Section labelledBy="pubs-title" tone={pubsTone}>
-        <Container>
-          <div className="reveal">
-            <SectionHeader
-              index={pubsIndex}
-              eyebrow="Yayınlar"
-              id="pubs-title"
-              title={d.publicationsTitle}
-              intro={d.publicationsIntro}
-              action={publications.length ? <LinkArrow href="/yayinlar">Tüm yayınlar</LinkArrow> : undefined}
-            />
-          </div>
+          <SectionHeader
+            index={pubsIndex}
+            eyebrow="Yayınlar"
+            id="pubs-title"
+            title={d.publicationsTitle}
+            intro={d.publicationsIntro}
+            action={publications.length ? <LinkArrow href="/yayinlar">Tüm yayınlar</LinkArrow> : undefined}
+          />
           <div className="mt-12 lg:mt-16">
             {publications.length ? (
               <ul className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
                 {publications.map((p) => (
-                  <li key={p.id} className="reveal">
-                    <PublicationCard pub={p} />
+                  <li key={p.id}>
+                    <PublicationCard pub={p} showCover />
                   </li>
                 ))}
               </ul>
@@ -188,7 +168,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
-      {/* İletişim çağrısı */}
+      {/* 09 · İletişim çağrısı */}
       <Section tone="dark" labelledBy="contact-title">
         <Container>
           <div className="grid grid-cols-12 md:gap-x-8 gap-y-10">
@@ -197,19 +177,19 @@ export default async function HomePage() {
               <span aria-hidden="true" className="h-px w-10 bg-background/40 lg:w-8" />
               <span className="eyebrow">İletişim</span>
             </div>
-            <div className="reveal col-span-12 lg:col-span-6">
+            <div className="col-span-12 lg:col-span-6">
               <h2 id="contact-title" className="display-lg">
                 {d.contactTitle}
               </h2>
               <p className="lead mt-6 max-w-xl">{d.contactText}</p>
               <div className="mt-9">
-                <ButtonLink href="/iletisim" variant="light" arrow>
+                <ButtonLink href="/iletisim" variant="light">
                   {d.contactCtaLabel}
                 </ButtonLink>
               </div>
             </div>
             {settings.address || settings.phone || settings.email ? (
-              <address className="reveal col-span-12 space-y-3 text-[0.98rem] not-italic leading-relaxed text-background/80 lg:col-span-3 lg:pt-3">
+              <address className="col-span-12 space-y-3 text-[0.98rem] not-italic leading-relaxed text-background/80 lg:col-span-3 lg:pt-3">
                 {settings.address ? <p className="whitespace-pre-line">{settings.address}</p> : null}
                 {settings.phone ? (
                   <p>
@@ -231,5 +211,26 @@ export default async function HomePage() {
         </Container>
       </Section>
     </>
+  );
+}
+
+/**
+ * Metin/kart yoğunluğunu kırmak için tek, kontrollü bir görsel duraklama.
+ * Gerçek ofis/mimari fotoğrafı geldiğinde bu bileşendeki desen yerine img/next-image ile
+ * değiştirilebilir (bkz. README → "Fotoğraf yer tutucuları").
+ */
+function ArchitecturalBreak() {
+  return (
+    <div aria-hidden="true" className="on-dark relative h-[56vh] min-h-[320px] w-full overflow-hidden bg-ink text-background sm:h-[64vh] lg:h-[72vh]">
+      <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <line x1="0" y1="0" x2="100" y2="62" stroke="currentColor" strokeOpacity="0.16" strokeWidth="0.1" />
+        <line x1="0" y1="30" x2="100" y2="100" stroke="currentColor" strokeOpacity="0.16" strokeWidth="0.1" />
+        <line x1="38" y1="0" x2="38" y2="100" stroke="currentColor" strokeOpacity="0.09" strokeWidth="0.06" />
+        <line x1="72" y1="0" x2="72" y2="100" stroke="currentColor" strokeOpacity="0.09" strokeWidth="0.06" />
+      </svg>
+      <div className="absolute bottom-8 left-5 sm:bottom-10 sm:left-8 lg:left-12 xl:left-16">
+        <p className="text-[0.66rem] font-semibold uppercase tracking-[0.26em] text-background/55">LRN Hukuk · Ankara</p>
+      </div>
+    </div>
   );
 }

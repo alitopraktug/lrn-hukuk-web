@@ -29,7 +29,7 @@ export default async function ContactPage() {
     rows.push({
       label: "Telefon",
       node: (
-        <a href={telHref(s.phone)} className="hover:text-forest">
+        <a href={telHref(s.phone)} className="hover:text-wine">
           {s.phone}
         </a>
       ),
@@ -38,7 +38,7 @@ export default async function ContactPage() {
     rows.push({
       label: "E-posta",
       node: (
-        <a href={`mailto:${s.email}`} className="hover:text-forest">
+        <a href={`mailto:${s.email}`} className="hover:text-wine">
           {s.email}
         </a>
       ),

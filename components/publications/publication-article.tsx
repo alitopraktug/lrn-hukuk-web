@@ -70,7 +70,7 @@ export function PublicationArticle({
                   <dt className="eyebrow !text-quiet">Yazar</dt>
                   <dd className="mt-1">
                     {pub.author.slug ? (
-                      <Link href={`/ekibimiz/${pub.author.slug}`} className="text-forest underline underline-offset-4 hover:text-wine">
+                      <Link href={`/ekibimiz/${pub.author.slug}`} className="text-wine underline underline-offset-4 hover:text-wine">
                         {pub.author.name}
                       </Link>
                     ) : (

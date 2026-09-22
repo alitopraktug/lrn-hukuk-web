@@ -1,9 +1,10 @@
-import { Container, ButtonLink, Emphasis } from "@/components/ui/primitives";
+import { ButtonLink, Emphasis, LinkArrow } from "@/components/ui/primitives";
 
 /**
- * Ana sayfa kapağı: klişe hukuk görselleri yerine editoryal tipografi + soyut "kimlik plakası".
- * Plaka; marka yeşili zemin, ince dikey çizgiler ve monogramın büyük, silik bir kesitinden oluşur.
- * Ankara'nın gerçek koordinatları (39°55′K · 32°51′D) mimari bir çizim etiketi gibi kullanılır.
+ * Ana sayfa kapağı — editoryal, mimari. Klişe hukuk görselleri (terazi/tokmak/Themis) yerine;
+ * solda büyük serif başlık + ölçülü CTA'lar, sağda kenardan kenara (edge-to-edge) soyut mimari
+ * panel (gerçek ofis/mimari fotoğrafı eklenene kadarki yer tutucu — bkz. README).
+ * Alt kısımda ince bir çizgi ve bölüm numarası (01), site boyunca süren görsel imza.
  */
 export function Hero({
   eyebrow,
@@ -19,69 +20,68 @@ export function Hero({
   secondaryLabel: string;
 }) {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      {/* İnce dikey kılavuz çizgileri — sitenin ızgara imzası */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
-        <div className="mx-auto h-full w-full max-w-[1320px] px-12">
-          <div className="grid h-full grid-cols-4 border-x border-line/0">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="border-l border-line/70 last:border-r" />
-            ))}
+    <section aria-labelledby="hero-title" className="relative border-b border-line">
+      <div className="grid grid-cols-1 lg:grid-cols-[52fr_48fr] lg:items-stretch">
+        <div className="order-2 flex min-h-[auto] flex-col justify-center px-5 pb-16 pt-10 sm:px-8 sm:pb-20 sm:pt-14 lg:order-1 lg:min-h-[82vh] lg:px-12 lg:py-24 xl:pl-16">
+          <div className="mx-auto w-full max-w-[620px] lg:mx-0 lg:max-w-[560px]">
+            <p className="eyebrow rise">{eyebrow}</p>
+            <h1 id="hero-title" className="display-xl rise mt-6 sm:mt-8" style={{ ["--d" as string]: "70ms" }}>
+              <Emphasis text={title} />
+            </h1>
+            <p className="lead rise mt-7 max-w-[46ch] sm:mt-8" style={{ ["--d" as string]: "140ms" }}>
+              {lead}
+            </p>
+            <div className="rise mt-9 flex flex-wrap items-center gap-x-7 gap-y-4 sm:mt-11" style={{ ["--d" as string]: "210ms" }}>
+              <ButtonLink href="/calisma-alanlari" variant="primary">
+                {primaryLabel}
+              </ButtonLink>
+              <LinkArrow href="/hakkimizda">{secondaryLabel}</LinkArrow>
+            </div>
           </div>
+        </div>
+
+        <div className="relative order-1 aspect-[5/4] w-full sm:aspect-[16/10] lg:order-2 lg:aspect-auto">
+          <ArchitecturalPanel />
         </div>
       </div>
 
-      <Container className="relative">
-        <div className="grid min-h-[max(70vh,32rem)] grid-cols-12 items-center md:gap-x-8 gap-y-12 py-14 sm:py-20 lg:min-h-[max(78vh,40rem)] lg:py-24">
-          <div className="col-span-12 lg:col-span-7">
-            <p className="eyebrow rise">{eyebrow}</p>
-            <h1 id="hero-title" className="display-xl mt-7 max-w-[15em] sm:mt-9">
-              <Emphasis text={title} />
-            </h1>
-            <p className="lead rise mt-8 max-w-xl" style={{ ["--d" as string]: "120ms" }}>
-              {lead}
-            </p>
-            <div className="rise mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4" style={{ ["--d" as string]: "220ms" }}>
-              <ButtonLink href="/calisma-alanlari" variant="primary" arrow>
-                {primaryLabel}
-              </ButtonLink>
-              <ButtonLink href="/iletisim" variant="outline">
-                {secondaryLabel}
-              </ButtonLink>
-            </div>
-          </div>
-
-          <div className="rise col-span-12 hidden lg:col-span-5 lg:block" style={{ ["--d" as string]: "160ms" }}>
-            <IdentityPlate />
-          </div>
-        </div>
-      </Container>
+      <div className="mx-auto flex w-full max-w-[1380px] items-center justify-between px-5 py-3 text-[0.72rem] tracking-[0.08em] text-quiet sm:px-8 lg:px-12 xl:px-16">
+        <span className="hidden sm:inline">LRN Hukuk</span>
+        <span className="index-num">01</span>
+      </div>
     </section>
   );
 }
 
-function IdentityPlate() {
+/**
+ * Gerçek ofis/mimari fotoğrafı gelene kadarki yer tutucu: ince çizgi ızgarası + mimari kesit
+ * hissi veren tek bir açılı çizgi + silik monogram + "Ankara" etiketi. Stok görsel değil, sahte
+ * fotoğraf da değil — bilinçli olarak soyut bir yer tutucu bileşendir (bkz. README).
+ */
+function ArchitecturalPanel() {
   return (
-    <div aria-hidden="true" className="on-dark relative ml-auto aspect-[4/5] w-full max-w-[440px] overflow-hidden bg-forest text-background">
-      {[25, 50, 75].map((p) => (
-        <span key={p} className="absolute inset-y-0 w-px bg-background/[0.09]" style={{ left: `${p}%` }} />
-      ))}
-      <span className="absolute inset-x-0 top-[62%] h-px bg-background/[0.09]" />
+    <div aria-hidden="true" className="on-dark absolute inset-0 overflow-hidden bg-ink text-background">
+      <svg className="absolute inset-0 h-full w-full opacity-[0.5]" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <line x1="0" y1="100" x2="100" y2="18" stroke="currentColor" strokeWidth="0.15" />
+        <line x1="0" y1="72" x2="100" y2="0" stroke="currentColor" strokeWidth="0.15" />
+        <line x1="22" y1="0" x2="22" y2="100" stroke="currentColor" strokeWidth="0.08" />
+        <line x1="60" y1="0" x2="60" y2="100" stroke="currentColor" strokeWidth="0.08" />
+      </svg>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/brand/logo-mark-light.svg"
         alt=""
         width={862}
         height={792}
-        className="absolute -bottom-[7%] -right-[16%] w-[96%] max-w-none opacity-[0.11]"
+        className="absolute -bottom-[10%] -right-[18%] w-[78%] max-w-[640px] opacity-[0.07]"
       />
-      <div className="absolute left-7 top-7 flex items-center gap-3">
+      <div className="absolute left-6 top-6 flex items-center gap-3 sm:left-8 sm:top-8">
         <span className="h-px w-8 bg-background/40" />
-        <span className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-background/65">LRN</span>
+        <span className="text-[0.66rem] font-semibold uppercase tracking-[0.26em] text-background/60">LRN Hukuk</span>
       </div>
-      <div className="absolute bottom-7 left-7 right-7">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-background/60">Ankara</p>
-        <p className="mt-2 font-serif text-[1.35rem] leading-none text-background/90">39°55′ K · 32°51′ D</p>
+      <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8">
+        <p className="text-[0.66rem] font-semibold uppercase tracking-[0.26em] text-background/55">Ankara</p>
+        <p className="mt-2 font-serif text-[1.3rem] leading-none text-background/85">39°55′ K · 32°51′ D</p>
       </div>
     </div>
   );

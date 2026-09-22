@@ -120,7 +120,7 @@ export default async function PublicationsPage({ searchParams }: { searchParams:
                 </>
               )}
               {" · "}
-              <Link href="/yayinlar" className="text-forest underline underline-offset-4">
+              <Link href="/yayinlar" className="text-wine underline underline-offset-4">
                 Filtreyi temizle
               </Link>
             </p>
@@ -154,7 +154,7 @@ function CategoryChip({ href, active, children }: { href: string; active: boolea
       aria-current={active ? "page" : undefined}
       className={cn(
         "inline-flex min-h-10 items-center border px-4 py-1.5 text-[0.85rem] transition-colors",
-        active ? "border-forest bg-forest text-background" : "border-line hover:border-forest hover:text-forest",
+        active ? "border-wine bg-wine text-background" : "border-line hover:border-wine hover:text-wine",
       )}
     >
       {children}

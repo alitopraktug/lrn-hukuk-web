@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const btn =
-  "inline-flex min-h-11 items-center gap-2 border border-line px-4 py-2 text-[0.78rem] font-semibold uppercase tracking-[0.1em] transition-colors hover:border-forest hover:text-forest";
+  "inline-flex min-h-11 items-center gap-2 border border-line px-4 py-2 text-[0.78rem] font-semibold uppercase tracking-[0.1em] transition-colors hover:border-wine hover:text-wine";
 
 /** Makale paylaşımı bilinçli olarak minimal tutulur: yalnızca bağlantıyı kopyalama ve yazdırma. */
 export function ArticleActions() {
@@ -28,7 +28,7 @@ export function ArticleActions() {
       <button type="button" onClick={() => window.print()} className={btn}>
         Yazdır
       </button>
-      <span role="status" aria-live="polite" className="basis-full text-sm text-forest">
+      <span role="status" aria-live="polite" className="basis-full text-sm text-wine">
         {copied ? "Bağlantı kopyalandı." : ""}
       </span>
     </div>

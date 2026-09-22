@@ -75,7 +75,7 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
           <p className="font-serif text-xl leading-snug">Çerez tercihleriniz</p>
           <p className="mt-2 text-sm leading-relaxed text-quiet">
             Sitenin çalışması için gerekli çerezler her zaman kullanılır. İsterseniz, ziyaretçi istatistiklerini toplu olarak anlamamıza yardımcı olan analitik çerezlere de izin verebilirsiniz.{" "}
-            <Link href="/cerez-politikasi" className="text-forest underline underline-offset-4">
+            <Link href="/cerez-politikasi" className="text-wine underline underline-offset-4">
               Çerez Politikası
             </Link>
           </p>
@@ -90,7 +90,7 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
           <button
             type="button"
             onClick={() => dialogRef.current?.showModal()}
-            className="mt-3 text-sm text-quiet underline underline-offset-4 hover:text-forest"
+            className="mt-3 text-sm text-quiet underline underline-offset-4 hover:text-wine"
           >
             Tercihleri yönet
           </button>
@@ -149,7 +149,7 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
                   onChange={(e) => setAnalytics(e.target.checked)}
                   className="peer sr-only"
                 />
-                <span aria-hidden="true" className="absolute inset-0 rounded-full bg-stone/60 transition-colors peer-checked:bg-forest peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-wine" />
+                <span aria-hidden="true" className="absolute inset-0 rounded-full bg-stone/60 transition-colors peer-checked:bg-wine peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-wine" />
                 <span aria-hidden="true" className="absolute left-1 h-5 w-5 rounded-full bg-white transition-transform peer-checked:translate-x-5" />
               </label>
             </div>

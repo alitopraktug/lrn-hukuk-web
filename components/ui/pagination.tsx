@@ -28,7 +28,7 @@ export function Pagination({
   return (
     <nav aria-label={label} className={cn("flex flex-wrap items-center justify-center gap-1", className)}>
       {page > 1 ? (
-        <Link href={makeHref(page - 1)} rel="prev" className={cn(item, "border border-line hover:border-forest hover:text-forest")}>
+        <Link href={makeHref(page - 1)} rel="prev" className={cn(item, "border border-line hover:border-wine hover:text-wine")}>
           Önceki
         </Link>
       ) : null}
@@ -38,17 +38,17 @@ export function Pagination({
             …
           </span>
         ) : p === page ? (
-          <span key={p} aria-current="page" className={cn(item, "bg-forest text-background")}>
+          <span key={p} aria-current="page" className={cn(item, "bg-wine text-background")}>
             {p}
           </span>
         ) : (
-          <Link key={p} href={makeHref(p)} aria-label={`Sayfa ${p}`} className={cn(item, "border border-transparent hover:border-line hover:text-forest")}>
+          <Link key={p} href={makeHref(p)} aria-label={`Sayfa ${p}`} className={cn(item, "border border-transparent hover:border-line hover:text-wine")}>
             {p}
           </Link>
         ),
       )}
       {page < pageCount ? (
-        <Link href={makeHref(page + 1)} rel="next" className={cn(item, "border border-line hover:border-forest hover:text-forest")}>
+        <Link href={makeHref(page + 1)} rel="next" className={cn(item, "border border-line hover:border-wine hover:text-wine")}>
           Sonraki
         </Link>
       ) : null}

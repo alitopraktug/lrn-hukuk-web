@@ -23,7 +23,7 @@ export function Breadcrumb({ items, className }: { items: Crumb[]; className?: s
                     {c.name}
                   </span>
                 ) : (
-                  <Link href={c.path} className="underline-offset-4 hover:text-forest hover:underline">
+                  <Link href={c.path} className="underline-offset-4 hover:text-wine hover:underline">
                     {c.name}
                   </Link>
                 )}

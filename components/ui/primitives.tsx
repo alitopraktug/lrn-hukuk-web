@@ -6,7 +6,7 @@ import { cn, splitEmphasis } from "@/lib/utils";
 export function Container({ as, className, children, ...rest }: { as?: ElementType; className?: string; children: ReactNode } & ComponentProps<"div">) {
   const Tag = (as ?? "div") as ElementType;
   return (
-    <Tag className={cn("mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-12", className)} {...rest}>
+    <Tag className={cn("mx-auto w-full max-w-[1380px] px-5 sm:px-8 lg:px-12 xl:px-16", className)} {...rest}>
       {children}
     </Tag>
   );
@@ -27,9 +27,9 @@ export function Section({ id, tone = "default", className, children, labelledBy,
       id={id}
       aria-labelledby={labelledBy}
       className={cn(
-        "relative py-20 sm:py-24 lg:py-32",
+        "relative py-18 sm:py-28 lg:py-36",
         tone === "surface" && "bg-surface",
-        tone === "dark" && "on-dark bg-forest-dark text-background",
+        tone === "dark" && "on-dark bg-dark text-background",
         bordered && tone !== "dark" && "border-t border-line",
         className,
       )}

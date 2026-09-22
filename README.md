@@ -392,16 +392,19 @@ Tüm renkler `app/globals.css` başındaki belirteçlerdedir (bileşenlerde sabi
 
 ```css
 :root {
-  --background: #f5f1ea;   /* ivory */         --foreground: #252524;  /* charcoal */
-  --surface:    #faf8f4;                        --ink:        #181918;
-  --forest:     #1e3b26;   /* logo yeşili — ana vurgu */   --forest-dark: #142a1b;
-  --wine:       #6b2637;   /* yalnızca küçük editoryal vurgu */  --wine-dark: #4c1927;
-  --muted:      #a49d92;   --muted-foreground: #625d54;  --border: rgba(37,37,36,.12);
-  --radius: 4px;
+  --background: #f3f0e9;   /* warm ivory */      --foreground: #222220;  /* charcoal */
+  --surface:    #faf8f4;   /* soft off-white */  --ink:        #151615;  /* deep charcoal */
+  --dark:       #191a18;   /* koyu bölüm zemini (Yaklaşımımız / İletişim) */
+  --wine:       #652a35;   /* ANA vurgu — çizgi, hover, link, aktif durum, numara */  --wine-dark: #491d26;
+  --forest:     #263b34;   /* opsiyonel, nadiren kullanılır */  --forest-dark: #182a25;
+  --muted:      #8c877e;   /* warm gray */  --muted-foreground: #64605a;  --border: rgba(25,25,23,.14);
+  --radius: 3px;
 }
 ```
 
-Yazı tipleri `app/layout.tsx` içinde `next/font` ile tanımlıdır (başlık: Cormorant Garamond, gövde: Manrope; her ikisi Türkçe karakterleri destekler). Marka yeşili logodan (`#1E3B26`) örneklenmiştir.
+Ana kombinasyon **ivory + charcoal + bordo**'dur; lacivert kullanılmaz. Bordo yalnızca küçük vurgularda (çizgi, hover, link, aktif durum, monogram, bölüm numarası) kullanılır — sayfanın "lüks" hissi renkten değil tipografi/boşluk/oranlardan gelir. Orman yeşili (`--forest`) token'ı geriye dönük uyumluluk ve olası nadir kullanım için tanımlı bırakılmıştır; herkese açık sitede etkin olarak kullanılmaz.
+
+Yazı tipleri `app/layout.tsx` içinde `next/font` ile tanımlıdır (başlık: Cormorant Garamond, gövde: Manrope; her ikisi Türkçe karakterleri destekler).
 
 ## 23. Ekip ekleme
 
@@ -592,6 +595,7 @@ Proje herhangi bir ajans hesabına bağımlı değildir. Teslimde **LRN Hukuk'un
 
 ## Bilinen sınırlamalar
 
+- **Fotoğraf yer tutucuları:** Ana sayfada iki yerde gerçek ofis/mimari fotoğrafı **yoktur**, bilinçli olarak soyut bir yer tutucu kullanılmıştır (stok görsel değil, klişe hukuk imgesi değil): (1) [`components/home/hero.tsx`](components/home/hero.tsx) içindeki `ArchitecturalPanel` — kapağın sağ yarısı; (2) [`app/(public)/page.tsx`](<app/(public)/page.tsx>) içindeki `ArchitecturalBreak` — Hakkımızda ile Çalışma Alanları arasındaki tam genişlik koyu bölüm. Büro gerçek ofis/mimari fotoğraf sağladığında, bu iki bileşendeki soyut çizgi deseni `next/image` ile gerçek fotoğrafla değiştirilmelidir (4:5 / edge-to-edge kırpma önerilir, büyük yuvarlatılmış köşeli kart içine **alınmamalıdır**).
 - **Medya depolama:** görseller PostgreSQL'dedir (basitlik + tek yedek + maliyet). Binlerce görsel/çok büyük medya için `lib/media/storage.ts` arkasına S3 uyumlu sürücü eklenmelidir (arayüz hazırdır; **S3 sürücüsü uygulanmamıştır**).
 - **CSP:** Herkese açık sayfalarda `script-src 'unsafe-inline'` vardır (ISR ile nonce uyumsuz — bkz. [Güvenlik](#19-güvenlik)). Yönetim paneli de aynı politikayı kullanır.
 - **Hukuki metinler yer tutucudur** ve mevzuat/TBB uygunluğu büro tarafından doğrulanmalıdır.

@@ -103,10 +103,10 @@ export function AreaDetailView({ area, disclaimer, crumbs = true }: { area: Area
                         )}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block font-serif text-xl leading-tight group-hover:text-forest">{m.fullName}</span>
+                        <span className="block font-serif text-xl leading-tight group-hover:text-wine">{m.fullName}</span>
                         <span className="eyebrow mt-1 block !text-[0.66rem]">{m.title}</span>
                       </span>
-                      <Arrow className="text-forest transition-transform group-hover:translate-x-1" />
+                      <Arrow className="text-wine transition-transform group-hover:translate-x-1" />
                     </Link>
                   </li>
                 ))}
