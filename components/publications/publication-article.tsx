@@ -8,26 +8,39 @@ import { prepareRichText } from "@/lib/richtext";
 import { formatDate, isoDate } from "@/lib/utils";
 import type { PublicationDetail } from "@/lib/data/publications";
 import type { PublicationCardData } from "@/lib/data/types";
+import { UI, localizePath, type Locale } from "@/lib/i18n/config";
 
 const DAY = 24 * 60 * 60 * 1000;
+
+const COPY = {
+  tr: { author: "Yazar", published: "Yayın tarihi", updated: "Güncellenme", reading: "Okuma süresi", minutes: (n: number) => `${n} dakika`, tags: "Etiketler", notice: "Bilgilendirme notu", related: "İlgili Yayınlar" },
+  en: { author: "Author", published: "Published", updated: "Updated", reading: "Reading time", minutes: (n: number) => `${n} min`, tags: "Tags", notice: "Notice", related: "Related Publications" },
+} as const;
 
 /**
  * Makale sayfası (herkese açık sayfa ve yönetim paneli önizlemesi tarafından ortak kullanılır).
  * H1 yalnızca makale başlığıdır; gövdede H2/H3 kullanılır. Yazdırmada üst/alt bölümler gizlenir (globals.css).
+ * Yayın içeriği (başlık/metin) her zaman Türkçedir — bkz. README → Bilinen sınırlamalar; `locale="en"`
+ * yalnızca sayfa çerçevesini (kenar çubuğu etiketleri, bağlantılar) çevirir.
  */
 export function PublicationArticle({
   pub,
   disclaimer,
   related = [],
   crumbs = true,
+  locale = "tr",
 }: {
   pub: PublicationDetail;
   disclaimer: string;
   related?: PublicationCardData[];
   crumbs?: boolean;
+  locale?: Locale;
 }) {
   const prepared = prepareRichText(pub.content);
   const updated = pub.publishedAt && pub.updatedAt.getTime() - pub.publishedAt.getTime() > DAY ? pub.updatedAt : null;
+  const c = COPY[locale];
+  const pubsPath = localizePath("/yayinlar", locale);
+  const teamPath = localizePath("/ekibimiz", locale);
 
   return (
     <>
@@ -37,19 +50,23 @@ export function PublicationArticle({
             {crumbs ? (
               <Breadcrumb
                 items={[
-                  { name: "Yayınlar", path: "/yayinlar" },
-                  { name: pub.title, path: `/yayinlar/${pub.slug}` },
+                  { name: UI[locale].nav.publications, path: pubsPath },
+                  { name: pub.title, path: `${pubsPath}/${pub.slug}` },
                 ]}
+                locale={locale}
               />
             ) : (
               <div className="h-5" />
             )}
+            {locale === "en" ? (
+              <p className="mt-6 max-w-2xl border border-line bg-surface px-4 py-3 text-[0.85rem] text-quiet">{UI.en.trOnlyNotice}</p>
+            ) : null}
             <div className="mt-10 grid grid-cols-12 md:gap-x-8 sm:mt-14 lg:mt-16">
               <div className="col-span-12 lg:col-span-10 xl:col-span-9">
                 {pub.category ? (
                   <p className="eyebrow rise flex items-center gap-4">
                     <span aria-hidden="true" className="h-px w-8 bg-wine/60" />
-                    <Link href={`/yayinlar?kategori=${pub.category.slug}`} className="hover:text-wine-dark">
+                    <Link href={`${pubsPath}?kategori=${pub.category.slug}`} className="hover:text-wine-dark">
                       {pub.category.name}
                     </Link>
                   </p>
@@ -67,10 +84,10 @@ export function PublicationArticle({
               <div className="lg:sticky lg:top-[calc(var(--header-h)+28px)]">
               <dl className="grid grid-cols-2 gap-x-6 gap-y-5 text-[0.92rem] lg:grid-cols-1">
                 <div>
-                  <dt className="eyebrow !text-quiet">Yazar</dt>
+                  <dt className="eyebrow !text-quiet">{c.author}</dt>
                   <dd className="mt-1">
                     {pub.author.slug ? (
-                      <Link href={`/ekibimiz/${pub.author.slug}`} className="text-wine underline underline-offset-4 hover:text-wine">
+                      <Link href={`${teamPath}/${pub.author.slug}`} className="text-wine underline underline-offset-4 hover:text-wine">
                         {pub.author.name}
                       </Link>
                     ) : (
@@ -80,7 +97,7 @@ export function PublicationArticle({
                 </div>
                 {pub.publishedAt ? (
                   <div>
-                    <dt className="eyebrow !text-quiet">Yayın tarihi</dt>
+                    <dt className="eyebrow !text-quiet">{c.published}</dt>
                     <dd className="mt-1">
                       <time dateTime={isoDate(pub.publishedAt)}>{formatDate(pub.publishedAt)}</time>
                     </dd>
@@ -88,19 +105,19 @@ export function PublicationArticle({
                 ) : null}
                 {updated ? (
                   <div>
-                    <dt className="eyebrow !text-quiet">Güncellenme</dt>
+                    <dt className="eyebrow !text-quiet">{c.updated}</dt>
                     <dd className="mt-1">
                       <time dateTime={isoDate(updated)}>{formatDate(updated)}</time>
                     </dd>
                   </div>
                 ) : null}
                 <div>
-                  <dt className="eyebrow !text-quiet">Okuma süresi</dt>
-                  <dd className="mt-1">{pub.readingMinutes} dakika</dd>
+                  <dt className="eyebrow !text-quiet">{c.reading}</dt>
+                  <dd className="mt-1">{c.minutes(pub.readingMinutes)}</dd>
                 </div>
               </dl>
               <div className="mt-6">
-                <ArticleActions />
+                <ArticleActions locale={locale} />
               </div>
               </div>
             </aside>
@@ -115,7 +132,7 @@ export function PublicationArticle({
               <RichText prepared={prepared} className="max-w-[46rem]" />
 
               {pub.tags.length ? (
-                <ul className="mt-12 flex max-w-[46rem] flex-wrap gap-2" aria-label="Etiketler">
+                <ul className="mt-12 flex max-w-[46rem] flex-wrap gap-2" aria-label={c.tags}>
                   {pub.tags.map((t) => (
                     <li key={t.slug} className="border border-line px-3 py-1 text-[0.82rem] text-quiet">
                       {t.name}
@@ -125,7 +142,7 @@ export function PublicationArticle({
               ) : null}
 
               {disclaimer ? (
-                <aside className="mt-12 max-w-[46rem] border-l-2 border-wine/60 bg-surface px-5 py-4 text-[0.9rem] leading-relaxed text-quiet" aria-label="Bilgilendirme notu">
+                <aside className="mt-12 max-w-[46rem] border-l-2 border-wine/60 bg-surface px-5 py-4 text-[0.9rem] leading-relaxed text-quiet" aria-label={c.notice}>
                   {disclaimer}
                 </aside>
               ) : null}
@@ -138,12 +155,12 @@ export function PublicationArticle({
         <Section tone="surface" labelledBy="related-title" className="no-print">
           <Container>
             <h2 id="related-title" className="display-md">
-              İlgili Yayınlar
+              {c.related}
             </h2>
             <ul className="mt-10 grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
               {related.map((p) => (
                 <li key={p.id}>
-                  <PublicationCard pub={p} />
+                  <PublicationCard pub={p} basePath={pubsPath} locale={locale} />
                 </li>
               ))}
             </ul>

@@ -6,8 +6,14 @@ import { RichText } from "@/components/ui/seo-blocks";
 import { prepareRichText } from "@/lib/richtext";
 import { formatMonthYear } from "@/lib/utils";
 import type { TeamDetail } from "@/lib/data/team";
+import { UI, localizePath, type Locale } from "@/lib/i18n/config";
 
 const show = (m: Pick<TeamDetail, "hiddenFields">, key: string) => !m.hiddenFields.includes(key);
+
+const LABELS = {
+  tr: { bar: "Kayıtlı olduğu baro", tbb: "TBB sicil no", barNo: "Baro sicil no", careerStart: "Mesleğe başlama", bio: "Özgeçmiş", education: "Eğitim", professional: "Mesleki Bilgiler", areas: "Çalışma Alanları", languages: "Yabancı Diller", writings: "Yayınlar" },
+  en: { bar: "Bar association", tbb: "Bar Association ID", barNo: "Bar registry no.", careerStart: "Started practising", bio: "Background", education: "Education", professional: "Professional Information", areas: "Practice Areas", languages: "Languages", writings: "Publications" },
+} as const;
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -21,16 +27,20 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
 /**
  * Avukat profili (herkese açık sayfa ve yönetim paneli önizlemesi tarafından ortak kullanılır).
  * Boş alanlar için başlık GÖSTERİLMEZ; ayrıca yönetim panelinden "profilde göster" kutuları kapatılan bölümler gizlenir.
+ * `locale="en"` ile başlık/bio EN çevirisi (varsa) `member` üzerinde zaten uygulanmış olmalıdır
+ * (bkz. lib/i18n/localize.ts → localizeTeamMember); bu bileşen yalnızca sabit etiketleri çevirir.
  */
-export function TeamProfile({ member }: { member: TeamDetail }) {
+export function TeamProfile({ member, locale = "tr" }: { member: TeamDetail; locale?: Locale }) {
+  const l = LABELS[locale];
+  const t = UI[locale];
   const bio = member.bio.trim() ? prepareRichText(member.bio) : null;
   const barRows: [string, string][] = [];
   if (show(member, "barInfo")) {
-    if (member.barAssociation) barRows.push(["Kayıtlı olduğu baro", member.barAssociation]);
-    if (member.tbbNo) barRows.push(["TBB sicil no", member.tbbNo]);
-    if (member.barNo) barRows.push(["Baro sicil no", member.barNo]);
+    if (member.barAssociation) barRows.push([l.bar, member.barAssociation]);
+    if (member.tbbNo) barRows.push([l.tbb, member.tbbNo]);
+    if (member.barNo) barRows.push([l.barNo, member.barNo]);
   }
-  if (show(member, "careerStart") && member.careerStart) barRows.push(["Mesleğe başlama", formatMonthYear(member.careerStart)]);
+  if (show(member, "careerStart") && member.careerStart) barRows.push([l.careerStart, formatMonthYear(member.careerStart)]);
 
   const education = show(member, "education") ? member.education : [];
   const languages = show(member, "languages") ? member.languages : [];
@@ -83,13 +93,13 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
           ) : null}
 
           {bio ? (
-            <Block title="Özgeçmiş">
+            <Block title={l.bio}>
               <RichText prepared={bio} className="!text-[1.02rem] md:!text-[1.05rem]" />
             </Block>
           ) : null}
 
           {education.length ? (
-            <Block title="Eğitim">
+            <Block title={l.education}>
               <ul className="space-y-2 text-[1.02rem] leading-relaxed">
                 {education.map((e, i) => (
                   <li key={i}>{e}</li>
@@ -99,7 +109,7 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
           ) : null}
 
           {barRows.length ? (
-            <Block title="Mesleki Bilgiler">
+            <Block title={l.professional}>
               <dl className="grid gap-x-8 gap-y-3 text-[1.02rem] sm:grid-cols-[auto_1fr]">
                 {barRows.map(([k, v]) => (
                   <div key={k} className="contents">
@@ -112,11 +122,11 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
           ) : null}
 
           {areas.length ? (
-            <Block title="Çalışma Alanları">
+            <Block title={l.areas}>
               <ul className="flex flex-wrap gap-x-6 gap-y-3">
                 {areas.map((a) => (
                   <li key={a.id}>
-                    <Link href={`/calisma-alanlari/${a.slug}`} className="text-[1.02rem] text-wine underline decoration-wine/30 underline-offset-4 hover:decoration-wine">
+                    <Link href={`${localizePath("/calisma-alanlari", locale)}/${a.slug}`} className="text-[1.02rem] text-wine underline decoration-wine/30 underline-offset-4 hover:decoration-wine">
                       {a.title}
                     </Link>
                   </li>
@@ -126,13 +136,13 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
           ) : null}
 
           {languages.length ? (
-            <Block title="Yabancı Diller">
+            <Block title={l.languages}>
               <p className="text-[1.02rem]">{languages.join(" · ")}</p>
             </Block>
           ) : null}
 
           {writings.length ? (
-            <Block title="Yayınlar">
+            <Block title={l.writings}>
               <ul className="space-y-3 text-[1.02rem] leading-relaxed">
                 {writings.map((w, i) => (
                   <li key={i}>{w}</li>
@@ -142,7 +152,7 @@ export function TeamProfile({ member }: { member: TeamDetail }) {
           ) : null}
 
           <div className="mt-14">
-            <LinkArrow href="/ekibimiz">Tüm ekip</LinkArrow>
+            <LinkArrow href={localizePath("/ekibimiz", locale)}>{t.allTeam}</LinkArrow>
           </div>
         </div>
       </div>

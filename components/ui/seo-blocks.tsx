@@ -2,17 +2,19 @@ import Link from "next/link";
 import { jsonLd, breadcrumbLd, type Crumb } from "@/lib/jsonld";
 import { prepareRichText } from "@/lib/richtext";
 import { cn } from "@/lib/utils";
+import { UI, type Locale } from "@/lib/i18n/config";
 
 export function JsonLd({ data }: { data: unknown }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(data) }} />;
 }
 
 /** Sayfa yolu (breadcrumb) + BreadcrumbList JSON-LD. İlk öğe olarak "Ana Sayfa" otomatik eklenir. */
-export function Breadcrumb({ items, className }: { items: Crumb[]; className?: string }) {
-  const all: Crumb[] = [{ name: "Ana Sayfa", path: "/" }, ...items];
+export function Breadcrumb({ items, className, locale = "tr" }: { items: Crumb[]; className?: string; locale?: Locale }) {
+  const t = UI[locale];
+  const all: Crumb[] = [{ name: t.breadcrumbHome, path: locale === "tr" ? "/" : "/en" }, ...items];
   return (
     <>
-      <nav aria-label="Sayfa yolu" className={cn("text-[0.8rem] text-quiet", className)}>
+      <nav aria-label={locale === "tr" ? "Sayfa yolu" : "Breadcrumb"} className={cn("text-[0.8rem] text-quiet", className)}>
         <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
           {all.map((c, i) => {
             const last = i === all.length - 1;

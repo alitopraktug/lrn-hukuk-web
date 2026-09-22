@@ -6,6 +6,7 @@ import { startTransition, useActionState, useEffect, useRef, useState } from "re
 import { submitContact } from "@/app/(public)/iletisim/actions";
 import { idleState, type ActionState } from "@/lib/actions";
 import { CONTACT_LIMITS } from "@/lib/validation/contact-limits";
+import type { Locale } from "@/lib/i18n/config";
 
 // Zod (≈95 KB gz) ilk boyamayı geciktirmesin diye tembel yüklenir: ilk alana odaklanılınca ön yüklenir, gönderimde beklenir.
 const loadSchema = () => import("@/lib/validation/contact");
@@ -14,17 +15,49 @@ type Props = {
   notice: string;
   consentLabel: string;
   turnstileSiteKey?: string;
+  locale?: Locale;
 };
 
+const COPY = {
+  tr: {
+    name: "Ad Soyad",
+    email: "E-posta",
+    phone: "Telefon",
+    optional: "(isteğe bağlı)",
+    subject: "Konu",
+    message: "Mesaj",
+    submit: "Gönder",
+    submitting: "Gönderiliyor…",
+    required: "Zorunlu alan",
+    sentTitle: "Mesajınız iletildi.",
+    sendAnother: "Yeni bir mesaj gönder",
+    readingNotice: "Aydınlatma Metni",
+  },
+  en: {
+    name: "Full Name",
+    email: "Email",
+    phone: "Phone",
+    optional: "(optional)",
+    subject: "Subject",
+    message: "Message",
+    submit: "Send",
+    submitting: "Sending…",
+    required: "Required field",
+    sentTitle: "Your message has been sent.",
+    sendAnother: "Send another message",
+    readingNotice: "Privacy Notice",
+  },
+} as const;
+
 /** "{{KVKK Aydınlatma Metni}}'ni okudum…" → bağlantı içeren etiket. İşaret yoksa metnin başına bağlantı eklenir. */
-function ConsentLabel({ label }: { label: string }) {
+function ConsentLabel({ label, locale = "tr" }: { label: string; locale?: Locale }) {
   const m = label.match(/^([\s\S]*?)\{\{(.+?)\}\}([\s\S]*)$/);
   const link = (text: string) => (
     <Link href="/kvkk" target="_blank" className="text-wine underline underline-offset-4">
       {text}
     </Link>
   );
-  if (!m) return <>{label} ({link("Aydınlatma Metni")})</>;
+  if (!m) return <>{label} ({link(COPY[locale].readingNotice)})</>;
   return (
     <>
       {m[1]}
@@ -34,7 +67,8 @@ function ConsentLabel({ label }: { label: string }) {
   );
 }
 
-export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
+export function ContactForm({ notice, consentLabel, turnstileSiteKey, locale = "tr" }: Props) {
+  const c = COPY[locale];
   const [state, action, pending] = useActionState<ActionState, FormData>(submitContact, idleState);
   const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   const [startedAt, setStartedAt] = useState("");
@@ -59,14 +93,10 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
   if (state.status === "success") {
     return (
       <div role="status" className="border border-wine/30 bg-surface p-8 sm:p-10">
-        <p className="font-serif text-3xl leading-tight">Mesajınız iletildi.</p>
+        <p className="font-serif text-3xl leading-tight">{c.sentTitle}</p>
         <p className="mt-4 text-[1.02rem] leading-relaxed text-quiet">{state.message}</p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="link-arrow mt-6"
-        >
-          Yeni bir mesaj gönder
+        <button type="button" onClick={() => window.location.reload()} className="link-arrow mt-6">
+          {c.sendAnother}
         </button>
       </div>
     );
@@ -87,9 +117,9 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
     e.preventDefault();
     const form = e.currentTarget;
     const submitter = (e.nativeEvent as SubmitEvent).submitter;
-    const { contactSchema } = await loadSchema();
+    const { buildContactSchema } = await loadSchema();
     const data = new FormData(form, submitter);
-    const result = contactSchema.safeParse(Object.fromEntries(data));
+    const result = buildContactSchema(locale).safeParse(Object.fromEntries(data));
     if (!result.success) {
       const next: Record<string, string> = {};
       for (const issue of result.error.issues) {
@@ -134,14 +164,14 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className="field-label">
-            Ad Soyad <span aria-hidden="true">*</span>
+            {c.name} <span aria-hidden="true">*</span>
           </label>
           <input id="name" name="name" type="text" autoComplete="name" required maxLength={CONTACT_LIMITS.name} defaultValue={values.name} className="field-input" {...field("name")} />
           {err("name")}
         </div>
         <div>
           <label htmlFor="email" className="field-label">
-            E-posta <span aria-hidden="true">*</span>
+            {c.email} <span aria-hidden="true">*</span>
           </label>
           <input id="email" name="email" type="email" autoComplete="email" required maxLength={CONTACT_LIMITS.email} defaultValue={values.email} className="field-input" {...field("email")} />
           {err("email")}
@@ -151,14 +181,14 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <label htmlFor="phone" className="field-label">
-            Telefon <span className="font-normal text-quiet">(isteğe bağlı)</span>
+            {c.phone} <span className="font-normal text-quiet">{c.optional}</span>
           </label>
           <input id="phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" maxLength={CONTACT_LIMITS.phone} defaultValue={values.phone} className="field-input" {...field("phone")} />
           {err("phone")}
         </div>
         <div>
           <label htmlFor="subject" className="field-label">
-            Konu <span aria-hidden="true">*</span>
+            {c.subject} <span aria-hidden="true">*</span>
           </label>
           <input id="subject" name="subject" type="text" required maxLength={CONTACT_LIMITS.subject} defaultValue={values.subject} className="field-input" {...field("subject")} />
           {err("subject")}
@@ -168,7 +198,7 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
       <div>
         <div className="flex items-baseline justify-between gap-4">
           <label htmlFor="message" className="field-label">
-            Mesaj <span aria-hidden="true">*</span>
+            {c.message} <span aria-hidden="true">*</span>
           </label>
           <span className="text-xs text-quiet" aria-hidden="true">
             {count} / {CONTACT_LIMITS.message}
@@ -207,7 +237,7 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
             {...field("consent")}
           />
           <label htmlFor="consent" className="text-[0.95rem] leading-relaxed">
-            <ConsentLabel label={consentLabel} /> <span aria-hidden="true">*</span>
+            <ConsentLabel label={consentLabel} locale={locale} /> <span aria-hidden="true">*</span>
           </label>
         </div>
         {err("consent")}
@@ -221,14 +251,15 @@ export function ContactForm({ notice, consentLabel, turnstileSiteKey }: Props) {
         </label>
       </div>
       <input type="hidden" name="startedAt" value={startedAt} />
-      {turnstileSiteKey ? <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-language="tr" /> : null}
+      <input type="hidden" name="locale" value={locale} />
+      {turnstileSiteKey ? <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-language={locale} /> : null}
 
       <div className="flex flex-wrap items-center gap-5 pt-2">
         <button type="submit" disabled={pending} className="btn btn-primary min-w-40 disabled:cursor-wait disabled:opacity-70">
-          {pending ? "Gönderiliyor…" : "Gönder"}
+          {pending ? c.submitting : c.submit}
         </button>
         <p className="text-[0.82rem] text-quiet">
-          <span aria-hidden="true">*</span> Zorunlu alan
+          <span aria-hidden="true">*</span> {c.required}
         </p>
       </div>
     </form>

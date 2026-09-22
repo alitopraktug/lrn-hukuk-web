@@ -2,12 +2,19 @@ import Link from "next/link";
 import { MediaImage } from "@/components/ui/media";
 import { Arrow } from "@/components/ui/primitives";
 import type { TeamCardData } from "@/lib/data/types";
+import { UI, type Locale } from "@/lib/i18n/config";
 
-/** Ekip kartı: 4:5 portre, ad soyad, unvan, kısa bilgi. Fotoğraf yoksa marka yer tutucusu gösterilir. */
-export function TeamCard({ member, priority }: { member: TeamCardData; priority?: boolean }) {
+/**
+ * Ekip kartı: 4:5 portre, ad soyad, unvan, kısa bilgi. Fotoğraf yoksa marka yer tutucusu gösterilir.
+ * `member` zaten hedef dile çevrilmiş biçimde gelmelidir (bkz. app/en/team — title/shortBio orada eşlenir);
+ * bu bileşen yalnızca bağlantı/etiket dilini (`basePath`/`locale`) bilir.
+ */
+export function TeamCard({ member, priority, basePath = "/ekibimiz", locale = "tr" }: { member: TeamCardData; priority?: boolean; basePath?: string; locale?: Locale }) {
+  const href = `${basePath}/${member.slug}`;
+  const t = UI[locale];
   return (
     <article className="group flex h-full flex-col">
-      <Link href={`/ekibimiz/${member.slug}`} className="block" aria-label={`${member.fullName} – profili görüntüle`}>
+      <Link href={href} className="block" aria-label={locale === "tr" ? `${member.fullName} – profili görüntüle` : `${member.fullName} — view profile`}>
         <div className="relative aspect-[4/5] overflow-hidden bg-stone/25">
           {member.photo ? (
             <MediaImage
@@ -26,19 +33,14 @@ export function TeamCard({ member, priority }: { member: TeamCardData; priority?
       </Link>
       <div className="flex flex-1 flex-col pt-5">
         <h3 className="font-serif text-[1.6rem] leading-tight">
-          <Link href={`/ekibimiz/${member.slug}`} className="transition-colors hover:text-wine">
+          <Link href={href} className="transition-colors hover:text-wine">
             {member.fullName}
           </Link>
         </h3>
         <p className="eyebrow mt-2">{member.title}</p>
         {member.shortBio ? <p className="mt-3 line-clamp-3 text-[0.95rem] leading-relaxed text-quiet">{member.shortBio}</p> : null}
-        <Link
-          href={`/ekibimiz/${member.slug}`}
-          aria-hidden="true"
-          tabIndex={-1}
-          className="link-arrow mt-auto self-start pt-5"
-        >
-          Profil
+        <Link href={href} aria-hidden="true" tabIndex={-1} className="link-arrow mt-auto self-start pt-5">
+          {t.profile}
           <Arrow />
         </Link>
       </div>

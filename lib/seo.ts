@@ -29,6 +29,10 @@ export type SeoInput = {
   authors?: string[];
   /** Ana sayfa gibi başlığın olduğu gibi kullanılacağı durumlar. */
   absoluteTitle?: boolean;
+  /** "en" ile OG locale ve hreflang değişir. Varsayılan "tr". */
+  locale?: "tr" | "en";
+  /** Diğer dildeki karşılığının yolu (varsa) — hreflang için karşılıklı bağlantı üretir. */
+  alternatePath?: string;
 };
 
 export function buildMetadata(input: SeoInput, site: SeoSettings): Metadata {
@@ -44,15 +48,21 @@ export function buildMetadata(input: SeoInput, site: SeoSettings): Metadata {
     : [{ url: absoluteUrl("/brand/og-default.png"), width: 1200, height: 630, alt: site.firmName }];
 
   const openGraphType = input.type === "article" ? "article" : input.type === "profile" ? "profile" : "website";
+  const locale = input.locale ?? "tr";
+  const languages = input.alternatePath
+    ? locale === "tr"
+      ? { "tr-TR": url, "en-US": absoluteUrl(input.alternatePath) }
+      : { "en-US": url, "tr-TR": absoluteUrl(input.alternatePath) }
+    : undefined;
 
   return {
     title: input.seoTitle?.trim() || input.absoluteTitle || !input.title ? { absolute: shownTitle } : input.title,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: url, ...(languages ? { languages } : {}) },
     robots: input.noindex ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
       type: openGraphType,
-      locale: "tr_TR",
+      locale: locale === "en" ? "en_US" : "tr_TR",
       siteName: site.firmName,
       title: fullTitle,
       description,

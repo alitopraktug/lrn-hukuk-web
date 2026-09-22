@@ -3,10 +3,23 @@ import { MediaImage } from "@/components/ui/media";
 import { Arrow } from "@/components/ui/primitives";
 import type { PublicationCardData } from "@/lib/data/types";
 import { formatDate, isoDate } from "@/lib/utils";
+import { UI, type Locale } from "@/lib/i18n/config";
 
-/** Yayın kartı — kutulanmamış, editoryal: kategori, tarih, başlık, özet, okuma süresi. */
-export function PublicationCard({ pub, showCover = false }: { pub: PublicationCardData; showCover?: boolean }) {
-  const href = `/yayinlar/${pub.slug}`;
+/** Yayın kartı — kutulanmamış, editoryal: kategori, tarih, başlık, özet, okuma süresi.
+ *  `basePath`/`locale`: /en altında "/en/publications" ve "en" geçilir (içerik yine de Türkçedir). */
+export function PublicationCard({
+  pub,
+  showCover = false,
+  basePath = "/yayinlar",
+  locale = "tr",
+}: {
+  pub: PublicationCardData;
+  showCover?: boolean;
+  basePath?: string;
+  locale?: Locale;
+}) {
+  const href = `${basePath}/${pub.slug}`;
+  const t = UI[locale];
   return (
     <article className="group flex h-full flex-col border-t border-foreground/25 pt-5">
       {showCover && pub.cover ? (
@@ -28,7 +41,7 @@ export function PublicationCard({ pub, showCover = false }: { pub: PublicationCa
         {pub.featured ? (
           <>
             <span aria-hidden="true">·</span>
-            <span className="font-semibold text-wine">Öne çıkan</span>
+            <span className="font-semibold text-wine">{t.featured}</span>
           </>
         ) : null}
       </div>
@@ -39,11 +52,11 @@ export function PublicationCard({ pub, showCover = false }: { pub: PublicationCa
       </h3>
       {pub.excerpt ? <p className="mt-3 line-clamp-3 text-[0.97rem] leading-relaxed text-quiet">{pub.excerpt}</p> : null}
       <div className="mt-auto flex items-center justify-between gap-4 pt-6">
-        <Link href={href} className="link-arrow" aria-label={`${pub.title} – oku`}>
-          Oku
+        <Link href={href} className="link-arrow" aria-label={`${pub.title} — ${t.read}`}>
+          {t.read}
           <Arrow />
         </Link>
-        <span className="text-[0.8rem] text-quiet">{pub.readingMinutes} dk okuma</span>
+        <span className="text-[0.8rem] text-quiet">{t.readingMinutes(pub.readingMinutes)}</span>
       </div>
     </article>
   );

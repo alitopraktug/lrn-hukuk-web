@@ -30,5 +30,16 @@ export async function getSitemapEntries(): Promise<SitemapEntry[]> {
     ...areas.map((a) => ({ path: `/calisma-alanlari/${a.slug}`, lastModified: a.updatedAt, changeFrequency: "monthly" as const, priority: 0.8 })),
     ...team.map((t) => ({ path: `/ekibimiz/${t.slug}`, lastModified: t.updatedAt, changeFrequency: "monthly" as const, priority: 0.6 })),
     ...pubs.map((p) => ({ path: `/yayinlar/${p.slug}`, lastModified: p.updatedAt, changeFrequency: "monthly" as const, priority: 0.7 })),
+
+    // İngilizce (/en) — yayınlar (blog) hariç: makale içeriği her zaman Türkçe olduğundan, kafa karıştırıcı
+    // olmaması için /en/publications/[slug] adresleri site haritasına eklenmez (bkz. README).
+    { path: "/en", changeFrequency: "weekly", priority: 0.9, lastModified: pageUpdated.get("home") },
+    { path: "/en/about", changeFrequency: "monthly", priority: 0.6, lastModified: pageUpdated.get("about") },
+    { path: "/en/team", changeFrequency: "monthly", priority: 0.6, lastModified: latest(team.map((t) => t.updatedAt)) },
+    { path: "/en/practice-areas", changeFrequency: "monthly", priority: 0.8, lastModified: latest(areas.map((a) => a.updatedAt)) },
+    { path: "/en/publications", changeFrequency: "weekly", priority: 0.5 },
+    { path: "/en/contact", changeFrequency: "yearly", priority: 0.5 },
+    ...areas.map((a) => ({ path: `/en/practice-areas/${a.slug}`, lastModified: a.updatedAt, changeFrequency: "monthly" as const, priority: 0.7 })),
+    ...team.map((t) => ({ path: `/en/team/${t.slug}`, lastModified: t.updatedAt, changeFrequency: "monthly" as const, priority: 0.5 })),
   ];
 }

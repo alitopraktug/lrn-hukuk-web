@@ -46,6 +46,10 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Not: <html lang> kasıtlı olarak sabit "tr" kalır (headers()/cookies() kullanmak bu kökteki her sayfayı
+  // dinamik render'a zorlar ve ISR'ı kırar). /en altındaki gerçek dil işareti, o alt ağacı saran bir
+  // <div lang="en"> ile verilir (bkz. components/layout/public-shell.tsx) — ekran okuyucu ve CSS
+  // text-transform (TR "i" → "İ" büyütmesi) için yeterlidir; yalnızca kök <html> etiketi "tr" kalır.
   return (
     <html lang="tr" className={`${serif.variable} ${serifItalic.variable} ${sans.variable}`}>
       <body>{children}</body>

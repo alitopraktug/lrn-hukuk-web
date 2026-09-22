@@ -3,54 +3,80 @@ import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { rateLimit, retryMessage } from "@/lib/rate-limit";
 import { rateKey } from "@/lib/request";
-import { contactSchema } from "@/lib/validation/contact";
+import { buildContactSchema } from "@/lib/validation/contact";
 import { errorState, successState, zodFieldErrors, type ActionState } from "@/lib/actions";
 import { getSiteSettings } from "@/lib/data/site";
 import { isEmailConfigured, sendContactNotification } from "@/lib/email";
 import { multiLine, singleLine } from "@/lib/text";
 import { verifyTurnstile } from "@/lib/turnstile";
+import type { Locale } from "@/lib/i18n/config";
 
 /**
  * İletişim formu işleme hattı (Server Action'dan bağımsız, test edilebilir):
  *  honeypot → hız sınırı → Zod doğrulama → süre kontrolü → Turnstile (varsa) → DB kaydı (isteğe bağlı) + SMTP bildirimi.
  * Veri minimizasyonu: IP adresi mesajla birlikte SAKLANMAZ; yalnızca hız sınırı için anahtarlı özet olarak kullanılır.
+ * `locale` verilmezse TR varsayılır (geriye dönük uyumluluk — mevcut testler etkilenmez).
  */
-export type ContactContext = { ip: string; now?: number };
+export type ContactContext = { ip: string; now?: number; locale?: Locale };
 
 const MIN_FILL_MS = 3000;
-const SUCCESS = "Mesajınız iletildi. İlginiz için teşekkür ederiz; yanıt için e-posta adresiniz kullanılacaktır.";
+
+const M = {
+  tr: {
+    success: "Mesajınız iletildi. İlginiz için teşekkür ederiz; yanıt için e-posta adresiniz kullanılacaktır.",
+    rateIp: (r: string) => `Kısa sürede çok fazla mesaj gönderildi. ${r}`,
+    checkFields: "Lütfen işaretli alanları kontrol edin.",
+    tooFast: "Formu göndermeden önce lütfen birkaç saniye bekleyip tekrar deneyin.",
+    rateEmail: (r: string) => `Bu e-posta adresiyle kısa sürede çok fazla mesaj gönderildi. ${r}`,
+    turnstile: "Güvenlik doğrulaması tamamlanamadı. Lütfen sayfayı yenileyip tekrar deneyin.",
+    notConfigured: "Mesajınız şu anda alınamıyor. Lütfen daha sonra tekrar deneyin veya iletişim bilgilerimizi kullanın.",
+    failed: "Mesajınız gönderilemedi. Lütfen daha sonra tekrar deneyin veya iletişim bilgilerimizi kullanın.",
+  },
+  en: {
+    success: "Your message has been sent. Thank you for reaching out; we will reply to the email address you provided.",
+    rateIp: (r: string) => `Too many messages sent in a short time. ${r}`,
+    checkFields: "Please check the highlighted fields.",
+    tooFast: "Please wait a few seconds before submitting the form and try again.",
+    rateEmail: (r: string) => `Too many messages sent with this email address in a short time. ${r}`,
+    turnstile: "Security verification could not be completed. Please refresh the page and try again.",
+    notConfigured: "Your message cannot be received at the moment. Please try again later or use our contact details.",
+    failed: "Your message could not be sent. Please try again later or use our contact details.",
+  },
+} as const;
 
 export async function processContact(raw: Record<string, unknown>, ctx: ContactContext): Promise<ActionState> {
   const now = ctx.now ?? Date.now();
+  const locale: Locale = ctx.locale ?? "tr";
+  const t = M[locale];
 
   // 1) Honeypot: insanlar bu gizli alanı doldurmaz. Botu bilgilendirmeden "başarılı" gibi yanıtla.
-  if (typeof raw.website === "string" && raw.website.trim() !== "") return successState(SUCCESS);
+  if (typeof raw.website === "string" && raw.website.trim() !== "") return successState(t.success);
 
   // 2) IP başına hız sınırı
   const ipLimit = await rateLimit(rateKey("contact-ip", ctx.ip), 6, 60 * 60);
-  if (!ipLimit.ok) return errorState(`Kısa sürede çok fazla mesaj gönderildi. ${retryMessage(ipLimit.retryAfterSeconds)}`);
+  if (!ipLimit.ok) return errorState(t.rateIp(retryMessage(ipLimit.retryAfterSeconds)));
 
   // 3) Sunucu tarafı doğrulama (istemcideki ile aynı şema)
-  const parsed = contactSchema.safeParse(raw);
+  const parsed = buildContactSchema(locale).safeParse(raw);
   if (!parsed.success) {
-    return { status: "error", message: "Lütfen işaretli alanları kontrol edin.", fieldErrors: zodFieldErrors(parsed.error) };
+    return { status: "error", message: t.checkFields, fieldErrors: zodFieldErrors(parsed.error) };
   }
   const input = parsed.data;
 
   // 4) Çok hızlı gönderim (bot davranışı)
   const startedAt = Number(raw.startedAt);
   if (Number.isFinite(startedAt) && startedAt > 0 && now - startedAt < MIN_FILL_MS) {
-    return errorState("Formu göndermeden önce lütfen birkaç saniye bekleyip tekrar deneyin.");
+    return errorState(t.tooFast);
   }
 
   // 5) E-posta başına hız sınırı
   const emailLimit = await rateLimit(rateKey("contact-email", input.email), 3, 60 * 60);
-  if (!emailLimit.ok) return errorState(`Bu e-posta adresiyle kısa sürede çok fazla mesaj gönderildi. ${retryMessage(emailLimit.retryAfterSeconds)}`);
+  if (!emailLimit.ok) return errorState(t.rateEmail(retryMessage(emailLimit.retryAfterSeconds)));
 
   // 6) Turnstile (yapılandırılmışsa)
   const token = typeof raw["cf-turnstile-response"] === "string" ? (raw["cf-turnstile-response"] as string) : undefined;
   if (!(await verifyTurnstile(token, ctx.ip))) {
-    return errorState("Güvenlik doğrulaması tamamlanamadı. Lütfen sayfayı yenileyip tekrar deneyin.");
+    return errorState(t.turnstile);
   }
 
   // 7) Kayıt + bildirim
@@ -69,7 +95,7 @@ export async function processContact(raw: Record<string, unknown>, ctx: ContactC
 
   if (!store && !canEmail) {
     console.error("[contact] Mesaj alınamadı: ne veritabanı kaydı ne de SMTP bildirimi etkin.");
-    return errorState("Mesajınız şu anda alınamıyor. Lütfen daha sonra tekrar deneyin veya iletişim bilgilerimizi kullanın.");
+    return errorState(t.notConfigured);
   }
 
   const receivedAt = new Date(now);
@@ -98,7 +124,7 @@ export async function processContact(raw: Record<string, unknown>, ctx: ContactC
   }
 
   if (!recordId && !emailed) {
-    return errorState("Mesajınız gönderilemedi. Lütfen daha sonra tekrar deneyin veya iletişim bilgilerimizi kullanın.");
+    return errorState(t.failed);
   }
-  return successState(SUCCESS);
+  return successState(t.success);
 }

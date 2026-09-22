@@ -593,12 +593,19 @@ Proje herhangi bir ajans hesabına bağımlı değildir. Teslimde **LRN Hukuk'un
 | `prisma generate` hatası (kurulumda) | Node ≥ 22.12 kullanın; `npm install` yeniden çalıştırın |
 | Windows'ta `db:dev` locale hatası | Betik `--locale=C` kullanır; `.pgdata` klasörünü silip yeniden deneyin |
 
+## Çok dilli site (Türkçe + İngilizce)
+
+Site, `/en` öneki altında bir İngilizce sürüme sahiptir (ör. `/calisma-alanlari` → `/en/practice-areas`). Mimari: `lib/i18n/config.ts` (sabit arayüz metinleri sözlüğü + yol eşlemesi), `lib/i18n/content-en.ts` (7 çalışma alanının ve ekip yer tutucularının tam İngilizce çevirisi), `lib/content/defaults.ts`'teki `*_en` alanları (ana sayfa/hakkımızda metinleri — panelden düzenlenebilir, "İngilizce —" etiketiyle işaretli). Header'daki TR/EN bağlantısı aynı sayfanın diğer dildeki karşılığına gider. İletişim formu, doğrulama hataları ve başarı mesajı dahil uçtan uca İngilizce çalışır (`lib/validation/contact.ts` → `buildContactSchema(locale)`).
+
+**Sınır:** Yayınlar (blog yazıları) yalnızca Türkçe yazılabilir; `/en/yayınlar` altında liste/detay sayfaları İngilizce çerçeveyle birlikte Türkçe içeriği bir uyarıyla gösterir. Çalışma alanı/ekip için çeviri yoksa (yeni eklenen bir kayıt) aynı şekilde Türkçesi + uyarı gösterilir — hiçbir zaman boş sayfa dönmez. Yeni bir dil eklemek için `lib/i18n/config.ts` üstündeki yönergeye bakın.
+
 ## Bilinen sınırlamalar
 
 - **Fotoğraf yer tutucuları:** Ana sayfada iki yerde gerçek ofis/mimari fotoğrafı **yoktur**, bilinçli olarak soyut bir yer tutucu kullanılmıştır (stok görsel değil, klişe hukuk imgesi değil): (1) [`components/home/hero.tsx`](components/home/hero.tsx) içindeki `ArchitecturalPanel` — kapağın sağ yarısı; (2) [`app/(public)/page.tsx`](<app/(public)/page.tsx>) içindeki `ArchitecturalBreak` — Hakkımızda ile Çalışma Alanları arasındaki tam genişlik koyu bölüm. Büro gerçek ofis/mimari fotoğraf sağladığında, bu iki bileşendeki soyut çizgi deseni `next/image` ile gerçek fotoğrafla değiştirilmelidir (4:5 / edge-to-edge kırpma önerilir, büyük yuvarlatılmış köşeli kart içine **alınmamalıdır**).
 - **Medya depolama:** görseller PostgreSQL'dedir (basitlik + tek yedek + maliyet). Binlerce görsel/çok büyük medya için `lib/media/storage.ts` arkasına S3 uyumlu sürücü eklenmelidir (arayüz hazırdır; **S3 sürücüsü uygulanmamıştır**).
 - **CSP:** Herkese açık sayfalarda `script-src 'unsafe-inline'` vardır (ISR ile nonce uyumsuz — bkz. [Güvenlik](#19-güvenlik)). Yönetim paneli de aynı politikayı kullanır.
-- **Hukuki metinler yer tutucudur** ve mevzuat/TBB uygunluğu büro tarafından doğrulanmalıdır.
+- **Hukuki metinler yer tutucudur** ve mevzuat/TBB uygunluğu büro tarafından doğrulanmalıdır. KVKK/Çerez/Gizlilik/Kullanım Koşulları sayfalarının İngilizce çevirisi yoktur; `/en` altındaki bağlantıları Türkçe sayfaya gider (yalnızca bağlantı etiketi İngilizcedir).
+- **Site Ayarları'ndaki bazı metinler** (iletişim bildirimi, KVKK onay metni, alt bilgi metni, yayın uyarısı) tek dillidir — panelde nasıl girildiyse her iki dilde de öyle gösterilir.
 - **Doğrulama kapsamı:** arayüz Chromium tabanlı bir tarayıcıda (masaüstü ve 360–430 px mobil) elle denenmiştir; Safari/Firefox'ta ayrıca kontrol edilmemiştir. SMTP gerçek bir sağlayıcıya karşı denenmemiştir (yapılandırma yoksa yedek davranış test edilmiştir). Yük testi yapılmamıştır.
 - Zamanlanmış yayın, sayfa önbelleğinin yenilenmesine (en fazla 5 dk) bağlıdır.
 - Yalnızca Türkçe (tek dil) desteklenir.

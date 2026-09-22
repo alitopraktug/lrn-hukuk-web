@@ -11,13 +11,55 @@ import {
   readConsent,
   writeConsent,
 } from "@/lib/consent";
+import type { Locale } from "@/lib/i18n/config";
+
+const COPY = {
+  tr: {
+    bannerTitle: "Çerez tercihleriniz",
+    bannerBody: "Sitenin çalışması için gerekli çerezler her zaman kullanılır. İsterseniz, ziyaretçi istatistiklerini toplu olarak anlamamıza yardımcı olan analitik çerezlere de izin verebilirsiniz.",
+    cookiePolicy: "Çerez Politikası",
+    essentialOnly: "Yalnızca zorunlu",
+    accept: "Kabul et",
+    manage: "Tercihleri yönet",
+    dialogTitle: "Çerez tercihleri",
+    close: "Kapat",
+    dialogIntro: "İzin vermediğiniz kategoriler çalışmaz. Tercihinizi dilediğiniz zaman değiştirebilirsiniz.",
+    essentialTitle: "Zorunlu",
+    essentialText: "Sitenin çalışması ve tercihinizin hatırlanması için gereklidir. Kapatılamaz.",
+    alwaysOn: "Her zaman açık",
+    analyticsTitle: "Analitik",
+    analyticsText: "Ziyaretçi sayısı ve sayfa kullanımı gibi istatistikleri toplu olarak ölçmek için Google Analytics kullanılır.",
+    save: "Tercihimi kaydet",
+    ariaLabel: "Çerez tercihleri",
+  },
+  en: {
+    bannerTitle: "Your cookie preferences",
+    bannerBody: "Cookies required for the site to work are always used. If you wish, you can also allow analytics cookies, which help us understand visitor statistics in aggregate.",
+    cookiePolicy: "Cookie Policy",
+    essentialOnly: "Essential only",
+    accept: "Accept",
+    manage: "Manage preferences",
+    dialogTitle: "Cookie preferences",
+    close: "Close",
+    dialogIntro: "Categories you don't allow will not run. You can change your preference at any time.",
+    essentialTitle: "Essential",
+    essentialText: "Required for the site to work and to remember your preference. Cannot be turned off.",
+    alwaysOn: "Always on",
+    analyticsTitle: "Analytics",
+    analyticsText: "Google Analytics is used to measure aggregate statistics such as visitor numbers and page usage.",
+    save: "Save my preference",
+    ariaLabel: "Cookie preferences",
+  },
+} as const;
 
 /**
  * Çerez tercihi. Yalnızca zorunlu çerezler kullanılıyorsa (GA tanımlı değilse) HİÇBİR banner gösterilmez.
  * GA tanımlıysa: karar verilene dek analitik yüklenmez; "Yalnızca zorunlu" ile "Kabul et" eşit görünürlüktedir;
- * tercih, sayfa altındaki "Çerez Tercihleri" bağlantısından her zaman değiştirilebilir.
+ * tercih, sayfa altındaki "Çerez Tercihleri" bağlantısından her zaman değiştirilebilir. `locale` ile
+ * banner/diyalog metni İngilizceye döner (bkz. lib/i18n/config.ts).
  */
-export function ConsentManager({ gaId }: { gaId: string | null }) {
+export function ConsentManager({ gaId, locale = "tr" }: { gaId: string | null; locale?: Locale }) {
+  const c = COPY[locale];
   const enabled = Boolean(gaId && GA_ID_PATTERN.test(gaId));
   const [ready, setReady] = useState(false);
   const [decided, setDecided] = useState(true);
@@ -69,22 +111,22 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
     <div data-consent>
       {!decided ? (
         <section
-          aria-label="Çerez tercihleri"
+          aria-label={c.ariaLabel}
           className="fixed inset-x-3 bottom-3 z-50 border border-line bg-surface p-5 shadow-soft sm:inset-x-auto sm:bottom-6 sm:left-6 sm:max-w-md sm:p-6"
         >
-          <p className="font-serif text-xl leading-snug">Çerez tercihleriniz</p>
+          <p className="font-serif text-xl leading-snug">{c.bannerTitle}</p>
           <p className="mt-2 text-sm leading-relaxed text-quiet">
-            Sitenin çalışması için gerekli çerezler her zaman kullanılır. İsterseniz, ziyaretçi istatistiklerini toplu olarak anlamamıza yardımcı olan analitik çerezlere de izin verebilirsiniz.{" "}
+            {c.bannerBody}{" "}
             <Link href="/cerez-politikasi" className="text-wine underline underline-offset-4">
-              Çerez Politikası
+              {c.cookiePolicy}
             </Link>
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <button type="button" onClick={() => choose(false)} className="btn btn-outline min-h-11 flex-1 px-4 py-2.5 text-[0.72rem]">
-              Yalnızca zorunlu
+              {c.essentialOnly}
             </button>
             <button type="button" onClick={() => choose(true)} className="btn btn-primary min-h-11 flex-1 px-4 py-2.5 text-[0.72rem]">
-              Kabul et
+              {c.accept}
             </button>
           </div>
           <button
@@ -92,7 +134,7 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
             onClick={() => dialogRef.current?.showModal()}
             className="mt-3 text-sm text-quiet underline underline-offset-4 hover:text-wine"
           >
-            Tercihleri yönet
+            {c.manage}
           </button>
         </section>
       ) : null}
@@ -115,30 +157,30 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
         >
           <div className="flex items-start justify-between gap-4">
             <h2 id="consent-title" className="font-serif text-2xl">
-              Çerez tercihleri
+              {c.dialogTitle}
             </h2>
-            <button type="button" onClick={() => dialogRef.current?.close()} aria-label="Kapat" className="-m-2 p-2 text-quiet hover:text-foreground">
+            <button type="button" onClick={() => dialogRef.current?.close()} aria-label={c.close} className="-m-2 p-2 text-quiet hover:text-foreground">
               <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M5 5l14 14M19 5L5 19" />
               </svg>
             </button>
           </div>
-          <p className="mt-2 text-sm text-quiet">İzin vermediğiniz kategoriler çalışmaz. Tercihinizi dilediğiniz zaman değiştirebilirsiniz.</p>
+          <p className="mt-2 text-sm text-quiet">{c.dialogIntro}</p>
 
           <div className="mt-6 divide-y divide-line border-y border-line">
             <div className="flex items-start justify-between gap-6 py-4">
               <div>
-                <p className="font-semibold">Zorunlu</p>
-                <p className="mt-1 text-sm text-quiet">Sitenin çalışması ve tercihinizin hatırlanması için gereklidir. Kapatılamaz.</p>
+                <p className="font-semibold">{c.essentialTitle}</p>
+                <p className="mt-1 text-sm text-quiet">{c.essentialText}</p>
               </div>
-              <span className="mt-1 shrink-0 text-xs font-semibold uppercase tracking-widest text-quiet">Her zaman açık</span>
+              <span className="mt-1 shrink-0 text-xs font-semibold uppercase tracking-widest text-quiet">{c.alwaysOn}</span>
             </div>
             <div className="flex items-start justify-between gap-6 py-4">
               <div>
                 <label htmlFor="consent-analytics" className="font-semibold">
-                  Analitik
+                  {c.analyticsTitle}
                 </label>
-                <p className="mt-1 text-sm text-quiet">Ziyaretçi sayısı ve sayfa kullanımı gibi istatistikleri toplu olarak ölçmek için Google Analytics kullanılır.</p>
+                <p className="mt-1 text-sm text-quiet">{c.analyticsText}</p>
               </div>
               <label className="relative mt-1 inline-flex h-7 w-12 shrink-0 cursor-pointer items-center">
                 <input
@@ -157,10 +199,10 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
 
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
             <button type="button" onClick={() => choose(false)} className="btn btn-outline px-5">
-              Yalnızca zorunlu
+              {c.essentialOnly}
             </button>
             <button type="submit" className="btn btn-primary px-5">
-              Tercihimi kaydet
+              {c.save}
             </button>
           </div>
         </form>
@@ -170,11 +212,11 @@ export function ConsentManager({ gaId }: { gaId: string | null }) {
 }
 
 /** Sayfa altındaki "Çerez Tercihleri" bağlantısı (yalnızca analitik yapılandırılmışsa gösterilir). */
-export function CookiePreferencesButton({ gaId, className }: { gaId: string | null; className?: string }) {
+export function CookiePreferencesButton({ gaId, className, label = "Çerez Tercihleri" }: { gaId: string | null; className?: string; label?: string }) {
   if (!gaId || !GA_ID_PATTERN.test(gaId)) return null;
   return (
     <button type="button" className={className} onClick={() => window.dispatchEvent(new Event(OPEN_CONSENT_EVENT))}>
-      Çerez Tercihleri
+      {label}
     </button>
   );
 }

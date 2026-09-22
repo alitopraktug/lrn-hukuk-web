@@ -74,6 +74,28 @@ export const HOME_FIELDS: FieldDef[] = [
   { name: "contactTitle", label: "İletişim bölümü – başlık", type: "text", max: 100 },
   { name: "contactText", label: "İletişim bölümü – metin", type: "textarea", max: 400, rows: 3 },
   { name: "contactCtaLabel", label: "İletişim bölümü – düğme yazısı", type: "text", max: 40 },
+
+  // İngilizce (/en) — yukarıdaki alanların İngilizce karşılığı. Boş bırakılırsa /en sayfasında da Türkçesi görünür.
+  { name: "heroEyebrow_en", label: "İngilizce — Kapak – üst etiket", type: "text", max: 60 },
+  { name: "heroTitle_en", label: "İngilizce — Kapak – ana başlık", type: "text", max: 160, hint: "Vurgu için *yıldız* kullanın." },
+  { name: "heroLead_en", label: "İngilizce — Kapak – alt metin", type: "textarea", max: 400, rows: 3 },
+  { name: "heroPrimaryCta_en", label: "İngilizce — Kapak – birinci bağlantı yazısı", type: "text", max: 40 },
+  { name: "heroSecondaryCta_en", label: "İngilizce — Kapak – ikinci bağlantı yazısı", type: "text", max: 40 },
+  { name: "aboutEyebrow_en", label: "İngilizce — Hakkımızda özeti – üst etiket", type: "text", max: 40 },
+  { name: "aboutTitle_en", label: "İngilizce — Hakkımızda özeti – başlık", type: "text", max: 160 },
+  { name: "aboutBody_en", label: "İngilizce — Hakkımızda özeti – metin", type: "textarea", max: 1600, rows: 8 },
+  { name: "aboutLinkLabel_en", label: "İngilizce — Hakkımızda özeti – bağlantı yazısı", type: "text", max: 40 },
+  { name: "practiceTitle_en", label: "İngilizce — Çalışma alanları – başlık", type: "text", max: 80 },
+  { name: "practiceIntro_en", label: "İngilizce — Çalışma alanları – kısa açıklama", type: "textarea", max: 300, rows: 2 },
+  { name: "teamTitle_en", label: "İngilizce — Ekip – başlık", type: "text", max: 80 },
+  { name: "teamIntro_en", label: "İngilizce — Ekip – kısa açıklama", type: "textarea", max: 300, rows: 2 },
+  { name: "approachStatement_en", label: "İngilizce — Çalışma Yaklaşımımız – büyük ifade", type: "textarea", max: 200, rows: 2 },
+  { name: "publicationsTitle_en", label: "İngilizce — Yayınlar – başlık", type: "text", max: 80 },
+  { name: "publicationsIntro_en", label: "İngilizce — Yayınlar – kısa açıklama", type: "textarea", max: 300, rows: 2 },
+  { name: "publicationsEmpty_en", label: "İngilizce — Yayınlar – henüz yayın yokken gösterilecek metin", type: "textarea", max: 300, rows: 2 },
+  { name: "contactTitle_en", label: "İngilizce — İletişim bölümü – başlık", type: "text", max: 100 },
+  { name: "contactText_en", label: "İngilizce — İletişim bölümü – metin", type: "textarea", max: 400, rows: 3 },
+  { name: "contactCtaLabel_en", label: "İngilizce — İletişim bölümü – düğme yazısı", type: "text", max: 40 },
 ];
 
 export const HOME_DEFAULTS: Record<string, string> = {
@@ -100,6 +122,29 @@ export const HOME_DEFAULTS: Record<string, string> = {
   contactText:
     "Genel bilgi talepleriniz ve iletişim için büromuza aşağıdaki bilgiler ya da iletişim formu aracılığıyla ulaşabilirsiniz.",
   contactCtaLabel: "İletişim Bilgileri",
+
+  heroEyebrow_en: "LRN LAW · ANKARA",
+  heroTitle_en: "A *careful, open* and holistic approach to legal matters.",
+  heroLead_en:
+    "LRN Law is a law firm based in Ankara. We handle individual and corporate legal matters in labour and social security, criminal, health, corporate, commercial, family and administrative law.",
+  heroPrimaryCta_en: "Practice Areas",
+  heroSecondaryCta_en: "About Our Firm",
+  aboutEyebrow_en: "About Us",
+  aboutTitle_en: "We approach legal matters holistically and with care.",
+  aboutBody_en:
+    "Every legal matter must be assessed together with its own facts, documents and deadlines. For this reason, our work centres on a careful review of the file, a clear explanation of the legal situation, and the diligence that professional responsibility requires.\n\nIn both individual and corporate matters, we take care to address issues that cross different areas of law together, so that the process is handled as a whole.\n\nConfidentiality and professional ethics are an integral part of how we work.",
+  aboutLinkLabel_en: "About Us",
+  practiceTitle_en: "Practice Areas",
+  practiceIntro_en: "We work on individual and corporate legal matters in the areas of law below.",
+  teamTitle_en: "Our Team",
+  teamIntro_en: "The lawyers at our firm and their professional background.",
+  approachStatement_en: "Every legal matter must be assessed carefully, on its own circumstances.",
+  publicationsTitle_en: "Publications",
+  publicationsIntro_en: "Articles prepared for general information on legal developments.",
+  publicationsEmpty_en: "Publications will appear in this section.",
+  contactTitle_en: "Contact LRN Law",
+  contactText_en: "For general enquiries and to get in touch with our firm, you can use the details below or the contact form.",
+  contactCtaLabel_en: "Contact Details",
 };
 
 /* ───────────────────────── Hakkımızda ───────────────────────── */
@@ -121,6 +166,24 @@ export const ABOUT_FIELDS: FieldDef[] = [
   { name: "principle3Text", label: "İlke 3 – açıklama", type: "textarea", max: 240, rows: 2 },
   { name: "principle4Title", label: "İlke 4 – başlık", type: "text", max: 40 },
   { name: "principle4Text", label: "İlke 4 – açıklama", type: "textarea", max: 240, rows: 2 },
+
+  // İngilizce (/en)
+  { name: "intro_en", label: "İngilizce — Giriş metni (sayfa başı)", type: "textarea", max: 400, rows: 3 },
+  { name: "officeTitle_en", label: "İngilizce — Büro – başlık", type: "text", max: 80 },
+  { name: "officeText_en", label: "İngilizce — Büro – metin", type: "textarea", max: 1600, rows: 7 },
+  { name: "approachTitle_en", label: "İngilizce — Yaklaşımımız – başlık", type: "text", max: 80 },
+  { name: "approachText_en", label: "İngilizce — Yaklaşımımız – metin", type: "textarea", max: 1600, rows: 7 },
+  { name: "workTitle_en", label: "İngilizce — Çalışma biçimimiz – başlık", type: "text", max: 80 },
+  { name: "workText_en", label: "İngilizce — Çalışma biçimimiz – metin", type: "textarea", max: 1600, rows: 7 },
+  { name: "principlesTitle_en", label: "İngilizce — İlkeler – başlık", type: "text", max: 80 },
+  { name: "principle1Title_en", label: "İngilizce — İlke 1 – başlık", type: "text", max: 40 },
+  { name: "principle1Text_en", label: "İngilizce — İlke 1 – açıklama", type: "textarea", max: 240, rows: 2 },
+  { name: "principle2Title_en", label: "İngilizce — İlke 2 – başlık", type: "text", max: 40 },
+  { name: "principle2Text_en", label: "İngilizce — İlke 2 – açıklama", type: "textarea", max: 240, rows: 2 },
+  { name: "principle3Title_en", label: "İngilizce — İlke 3 – başlık", type: "text", max: 40 },
+  { name: "principle3Text_en", label: "İngilizce — İlke 3 – açıklama", type: "textarea", max: 240, rows: 2 },
+  { name: "principle4Title_en", label: "İngilizce — İlke 4 – başlık", type: "text", max: 40 },
+  { name: "principle4Text_en", label: "İngilizce — İlke 4 – açıklama", type: "textarea", max: 240, rows: 2 },
 ];
 
 export const ABOUT_DEFAULTS: Record<string, string> = {
@@ -143,6 +206,26 @@ export const ABOUT_DEFAULTS: Record<string, string> = {
   principle3Text: "Hukuki durum ve süreç, anlaşılır bir dille ve düzenli olarak aktarılır.",
   principle4Title: "Mesleki Etik",
   principle4Text: "Çalışmalar, avukatlık mesleğinin ilke ve kurallarına uygun yürütülür.",
+
+  intro_en: "LRN Law is a law firm based in Ankara, working on individual and corporate legal matters.",
+  officeTitle_en: "LRN Law",
+  officeText_en:
+    "LRN Law is a law firm operating in Ankara. Our firm works on the legal matters of individuals and organisations in the areas of labour and social security, criminal, health, corporate, commercial, family and administrative law.\n\nOur firm is a small team and conducts its work in line with the principles and rules of the legal profession.",
+  approachTitle_en: "Our Approach",
+  approachText_en:
+    "We bring care to legal assessment, openness to communication, and diligence to professional principles. In every file, the facts, documents and deadlines are considered together; the legal situation and the process are explained to the person concerned in clear language.\n\nCommitment to confidentiality and professional ethics is fundamental to how we work.",
+  workTitle_en: "How We Work",
+  workText_en:
+    "Each individual and corporate legal matter is assessed on its own circumstances. How a matter concludes depends on the specifics of the case, the evidence and the applicable legislation; for this reason, no process is prejudged or promised an outcome in advance.\n\nFile information and documents are protected under the obligation of professional confidentiality.",
+  principlesTitle_en: "Our Principles",
+  principle1Title_en: "Diligence",
+  principle1Text_en: "Every file is examined with the care and attention it requires.",
+  principle2Title_en: "Confidentiality",
+  principle2Text_en: "File information is protected under the obligation of professional secrecy.",
+  principle3Title_en: "Openness",
+  principle3Text_en: "The legal situation and the process are communicated clearly and regularly.",
+  principle4Title_en: "Professional Ethics",
+  principle4Text_en: "Our work is carried out in line with the principles and rules of the legal profession.",
 };
 
 /* ───────────────────────── Hukuki sayfalar (YER TUTUCU) ───────────────────────── */
