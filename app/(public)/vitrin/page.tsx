@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Hero } from "@/components/home/hero";
+import { BoldHeroI18n } from "@/components/showcase/bold-hero-i18n";
 import { AreaVisualCard } from "@/components/showcase/area-visual-card";
 import { PublicationCard } from "@/components/publications/publication-card";
 import { TeamGrid } from "@/components/team/team-grid";
@@ -68,7 +68,27 @@ export default async function ShowcasePage() {
         </Link>
       </div>
 
-      <Hero eyebrow={d.heroEyebrow} title={d.heroTitle} lead={d.heroLead} primaryLabel={d.heroPrimaryCta} secondaryLabel={d.heroSecondaryCta} />
+      <BoldHeroI18n eyebrow={d.heroEyebrow} title={d.heroTitle} lead={d.heroLead} primaryLabel={d.heroPrimaryCta} secondaryLabel={d.heroSecondaryCta} />
+
+      {/* Sayılarla — gerçek, doğrulanabilir sayımlar (uydurma metrik/başarı oranı değil) */}
+      <div className="border-b border-line bg-surface">
+        <Container>
+          <ul className="grid grid-cols-1 divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            <li className="reveal flex items-baseline justify-center gap-3 py-8 sm:flex-col sm:items-start sm:gap-1 sm:px-8">
+              <span className="font-serif text-[2.4rem] leading-none text-forest">{pad2(areas.length)}</span>
+              <span className="eyebrow">Çalışma Alanı</span>
+            </li>
+            <li className="reveal flex items-baseline justify-center gap-3 py-8 sm:flex-col sm:items-start sm:gap-1 sm:px-8">
+              <span className="font-serif text-[2.4rem] leading-none text-forest">{pad2(team.length)}</span>
+              <span className="eyebrow">Avukat</span>
+            </li>
+            <li className="reveal flex items-baseline justify-center gap-3 py-8 sm:flex-col sm:items-start sm:gap-1 sm:px-8">
+              <span className="font-serif text-[1.7rem] leading-none text-forest">Ankara</span>
+              <span className="eyebrow">Merkez Ofis</span>
+            </li>
+          </ul>
+        </Container>
+      </div>
 
       {/* Hakkımızda özeti */}
       <Section labelledBy="about-title">
