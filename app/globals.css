@@ -1,0 +1,521 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Tasarım belirteçleri (design tokens) ─────────────────────────
+   Renkleri bileşenlerde sabit yazmayın; yalnızca bu değişkenleri kullanın.
+   Logo yeşili (#1E3B26) marka rengidir; bordo yalnızca küçük editoryal vurgularda kullanılır. */
+:root {
+  --background: #f5f1ea; /* ivory / kırık beyaz */
+  --surface: #faf8f4; /* daha açık yüzey */
+  --foreground: #252524; /* charcoal */
+  --ink: #181918; /* derin antrasit */
+  --wine: #6b2637; /* bordo */
+  --wine-dark: #4c1927;
+  --forest: #1e3b26; /* logo yeşili */
+  --forest-dark: #142a1b;
+  --muted: #a49d92; /* taş rengi — yalnızca dekoratif */
+  --muted-foreground: #625d54; /* okunabilir ikincil metin (AA) */
+  --border: rgba(37, 37, 36, 0.12);
+  --radius: 4px;
+  --header-h: 76px;
+  --danger: #9b2226;
+  --danger-dark: #7d1a1e;
+  --admin-bg: #f1efe9;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-wine: var(--wine);
+  --color-wine-dark: var(--wine-dark);
+  --color-forest: var(--forest);
+  --color-forest-dark: var(--forest-dark);
+  --color-stone: var(--muted);
+  --color-quiet: var(--muted-foreground);
+  --color-line: var(--border);
+  --color-danger: var(--danger);
+  --color-danger-dark: var(--danger-dark);
+  --color-admin: var(--admin-bg);
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-serif-italic: var(--font-cormorant-italic), var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@theme {
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+  --shadow-soft: 0 1px 2px rgba(24, 25, 24, 0.04), 0 8px 24px -12px rgba(24, 25, 24, 0.12);
+}
+
+/* ───────────────────────── Temel ───────────────────────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    scrollbar-gutter: stable;
+    background: var(--background);
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 1rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  ::selection {
+    background: var(--wine);
+    color: var(--background);
+  }
+  :focus-visible {
+    outline: 2px solid var(--wine);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .on-dark :focus-visible {
+    outline-color: var(--background);
+  }
+  img,
+  svg {
+    display: block;
+  }
+  dialog {
+    color: inherit;
+  }
+  /* Modal açıkken arka plan kaymasın (gövde kaydırma kilidi) */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+}
+
+/* ───────────────────────── Bileşen sınıfları ───────────────────────── */
+@layer components {
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--wine);
+  }
+  .on-dark .eyebrow {
+    color: color-mix(in srgb, var(--background) 72%, transparent);
+  }
+  .index-num {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    font-variant-numeric: lining-nums;
+    letter-spacing: 0.04em;
+    color: var(--wine);
+  }
+
+  /* Ana başlık ölçekleri */
+  .display-xl {
+    font-size: clamp(2.6rem, 1.5rem + 5vw, 5.9rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+  }
+  .display-lg {
+    font-size: clamp(2.1rem, 1.4rem + 2.8vw, 3.7rem);
+    line-height: 1.06;
+    letter-spacing: -0.016em;
+    font-weight: 400;
+  }
+  .display-md {
+    font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.5rem);
+    line-height: 1.12;
+    font-weight: 400;
+  }
+  .lead {
+    font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+    line-height: 1.65;
+    color: var(--muted-foreground);
+  }
+  .on-dark .lead {
+    color: color-mix(in srgb, var(--background) 78%, transparent);
+  }
+
+  /* Vurgulu kelime (*kelime* → <em>) */
+  .display-xl em,
+  .display-lg em,
+  .display-md em {
+    font-family: var(--font-serif-italic);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--forest);
+  }
+  .on-dark .display-xl em,
+  .on-dark .display-lg em,
+  .on-dark .display-md em {
+    color: var(--background);
+    opacity: 0.92;
+  }
+
+  /* Düğmeler */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .btn-primary {
+    background: var(--forest);
+    color: var(--background);
+  }
+  .btn-primary:hover {
+    background: var(--forest-dark);
+  }
+  .btn-outline {
+    border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+    color: var(--foreground);
+  }
+  .btn-outline:hover {
+    background: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+  }
+  .btn-light {
+    background: var(--background);
+    color: var(--forest-dark);
+  }
+  .btn-light:hover {
+    background: #fff;
+  }
+  .btn-outline-light {
+    border-color: color-mix(in srgb, var(--background) 45%, transparent);
+    color: var(--background);
+  }
+  .btn-outline-light:hover {
+    background: var(--background);
+    color: var(--forest-dark);
+  }
+
+  /* Ok içeren metin bağlantısı */
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--forest);
+    padding-block: 0.4rem;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.35s ease;
+  }
+  .link-arrow:hover {
+    background-size: 100% 1px;
+  }
+  .link-arrow svg {
+    transition: transform 0.3s ease;
+  }
+  .link-arrow:hover svg {
+    transform: translateX(4px);
+  }
+  .on-dark .link-arrow {
+    color: var(--background);
+  }
+
+  /* Gezinme bağlantısı (ince alt çizgi) */
+  .nav-link {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.35rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--foreground) 82%, transparent);
+    transition: color 0.2s ease;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--forest);
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current="page"]::after {
+    transform: scaleX(1);
+  }
+
+  /* Form alanları (herkese açık site) */
+  .field-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .field-input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--foreground);
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+    border-radius: var(--radius);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .field-input:hover {
+    border-color: color-mix(in srgb, var(--foreground) 45%, transparent);
+  }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--forest);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--forest) 18%, transparent);
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--wine);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--wine) 12%, transparent);
+  }
+  .field-error {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--wine);
+  }
+}
+
+/* ───────────────────────── Makale / uzun metin tipografisi ───────────────────────── */
+.prose-lrn {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--foreground);
+  overflow-wrap: break-word;
+}
+@media (min-width: 768px) {
+  .prose-lrn {
+    font-size: 1.125rem;
+  }
+}
+.prose-lrn > * + * {
+  margin-top: 1.3em;
+}
+.prose-lrn h2 {
+  font-size: clamp(1.65rem, 1.35rem + 1vw, 2.15rem);
+  line-height: 1.18;
+  margin-top: 2.3em;
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+.prose-lrn h3 {
+  font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.55rem);
+  line-height: 1.25;
+  margin-top: 1.9em;
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+.prose-lrn h2 + *,
+.prose-lrn h3 + * {
+  margin-top: 0.7em;
+}
+.prose-lrn a {
+  color: var(--forest);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.prose-lrn a:hover {
+  color: var(--wine);
+}
+.prose-lrn ul,
+.prose-lrn ol {
+  padding-left: 1.35em;
+}
+.prose-lrn ul {
+  list-style: disc;
+}
+.prose-lrn ol {
+  list-style: decimal;
+}
+.prose-lrn li + li {
+  margin-top: 0.45em;
+}
+.prose-lrn li::marker {
+  color: var(--wine);
+}
+.prose-lrn li > p {
+  margin: 0;
+}
+.prose-lrn blockquote {
+  border-left: 2px solid var(--wine);
+  padding: 0.2em 0 0.2em 1.3em;
+  font-family: var(--font-serif-italic);
+  font-style: italic;
+  font-size: 1.28em;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.prose-lrn blockquote p + p {
+  margin-top: 0.7em;
+}
+.prose-lrn hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: 2.6em;
+}
+.prose-lrn strong {
+  font-weight: 700;
+}
+.prose-lrn .table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.prose-lrn table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: 0.94em;
+  line-height: 1.55;
+}
+.prose-lrn th,
+.prose-lrn td {
+  border: 1px solid var(--border);
+  padding: 0.6em 0.85em;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-lrn th {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+/* ───────────────────────── Hareket (minimal, prefers-reduced-motion'a saygılı) ───────────────────────── */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--d, 0ms);
+  }
+  /* Kaydırmayla belirme: yalnızca desteklenen tarayıcılarda, JS'siz. Desteklenmiyorsa içerik doğrudan görünür. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 4% entry 38%;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ───────────────────────── Yazdırma ───────────────────────── */
+@media print {
+  [data-site-header],
+  [data-site-footer],
+  [data-consent],
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .prose-lrn {
+    font-size: 11.5pt;
+    line-height: 1.55;
+    max-width: none;
+  }
+  .prose-lrn a {
+    color: #000;
+    text-decoration: underline;
+  }
+  .prose-lrn a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+  .prose-lrn h2,
+  .prose-lrn h3 {
+    break-after: avoid;
+  }
+  .prose-lrn table,
+  .prose-lrn blockquote {
+    break-inside: avoid;
+  }
+  h1 {
+    font-size: 22pt !important;
+  }
+  .rise,
+  .reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

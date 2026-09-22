@@ -1,0 +1,43 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# generated (prisma client is produced by `npm install` / `npm run db:generate`)
+/generated
+
+# local database (embedded PostgreSQL used by `npm run db:dev`)
+/.pgdata
+
+# local uploads / backups
+/storage
+/backups
+
+# çevrimdışı müşteri demosu (npm run export:offline)
+/offline-demo
+
+# testing
+/coverage
+/test-results
+
+# env files — never commit real secrets
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+npm-debug.log*
+
+# vercel
+.vercel

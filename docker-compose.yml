@@ -1,0 +1,41 @@
+# Tek sunucuda çalıştırma: uygulama + PostgreSQL.
+#   1) .env dosyasını doldurun (DATABASE_URL, docker-compose içindeki adresle uyumlu olmalı — aşağıya bakın)
+#   2) docker compose up -d --build
+#   3) docker compose exec app npm run db:seed
+#   4) docker compose exec app npm run admin:create -- --email siz@alanadi.com --name "Ad Soyad"
+# Önünde bir ters vekil (nginx/Caddy) ile HTTPS sağlayın (deploy/nginx.conf.example).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lrn
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env içinde tanımlanmalı}
+      POSTGRES_DB: lrn_hukuk
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lrn -d lrn_hukuk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # .env içindeki DATABASE_URL yerine konteyner ağındaki adres kullanılır
+      DATABASE_URL: postgresql://lrn:${POSTGRES_PASSWORD}@db:5432/lrn_hukuk
+      NODE_ENV: production
+    ports:
+      - "127.0.0.1:3000:3000" # yalnızca yerel ters vekil erişsin
+    volumes:
+      - next_build:/app/.next
+
+volumes:
+  pgdata:
+  next_build:

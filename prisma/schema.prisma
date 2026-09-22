@@ -1,0 +1,357 @@
+// LRN Hukuk — veritabanı şeması (PostgreSQL)
+//
+// Notlar
+//  * Taslak/yayın: ContentStatus (DRAFT | PUBLISHED). Ekip üyeleri için PUBLISHED = "aktif", DRAFT = "pasif".
+//  * Yumuşak silme: deletedAt dolu kayıtlar sitede ve sitemap'te görünmez; panelde "Silinenler"den geri alınabilir.
+//  * Medya dosyaları varsayılan olarak MediaBlob tablosunda tutulur (tek yedekleme noktası, sağlayıcı bağımsız).
+//    STORAGE_DRIVER=s3 ile S3 uyumlu nesne depolamaya geçilebilir.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum MediaPurpose {
+  GENERAL
+  PHOTO
+  COVER
+  OG
+  LOGO
+  FAVICON
+}
+
+enum StorageKind {
+  DATABASE
+  S3
+}
+
+// ───────────────────────── Kimlik doğrulama ─────────────────────────
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  role               Role      @default(ADMIN)
+  passwordHash       String
+  active             Boolean   @default(true)
+  mustChangePassword Boolean   @default(false)
+  failedLogins       Int       @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  passwordChangedAt  DateTime?
+  // TOTP: sır AES-256-GCM ile şifreli saklanır; kurtarma kodları SHA-256 özeti olarak tutulur.
+  totpSecret         String?
+  totpEnabled        Boolean   @default(false)
+  totpLastStep       Int?
+  recoveryCodes      String[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  sessions    Session[]
+  resetTokens PasswordResetToken[]
+  auditLogs   AuditLog[]
+}
+
+model Session {
+  // id = SHA-256(çerezdeki ham token). Ham token veritabanında tutulmaz.
+  id                String   @id
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  twoFactorPending  Boolean  @default(false)
+  ip                String?
+  userAgent         String?
+  createdAt         DateTime @default(now())
+  lastSeenAt        DateTime @default(now())
+  expiresAt         DateTime
+  absoluteExpiresAt DateTime
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  // id = SHA-256(e-postadaki ham token)
+  id        String    @id
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ───────────────────────── Medya ─────────────────────────
+
+model Media {
+  id          String       @id @default(cuid())
+  purpose     MediaPurpose @default(GENERAL)
+  filename    String
+  mimeType    String
+  size        Int
+  width       Int?
+  height      Int?
+  alt         String       @default("")
+  blurDataUrl String?
+  storage     StorageKind  @default(DATABASE)
+  storageKey  String?
+  createdById String?
+  createdAt   DateTime     @default(now())
+
+  blob MediaBlob?
+
+  areaCovers  PracticeArea[] @relation("AreaCover")
+  areaOgs     PracticeArea[] @relation("AreaOg")
+  teamPhotos  TeamMember[]   @relation("TeamPhoto")
+  pubCovers   Publication[]  @relation("PubCover")
+  pubOgs      Publication[]  @relation("PubOg")
+  pageOgs     Page[]         @relation("PageOg")
+  siteLogos   SiteSetting[]  @relation("SiteLogo")
+  siteIcons   SiteSetting[]  @relation("SiteFavicon")
+  siteOgs     SiteSetting[]  @relation("SiteOg")
+
+  @@index([purpose, createdAt])
+}
+
+model MediaBlob {
+  mediaId String @id
+  media   Media  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  data    Bytes
+}
+
+// ───────────────────────── İçerik ─────────────────────────
+
+model PracticeArea {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  shortDescription String        @default("")
+  content          String        @default("")
+  topics           String[]
+  coverId          String?
+  cover            Media?        @relation("AreaCover", fields: [coverId], references: [id], onDelete: SetNull)
+  seoTitle         String?
+  seoDescription   String?
+  ogImageId        String?
+  ogImage          Media?        @relation("AreaOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+  status           ContentStatus @default(DRAFT)
+  sortOrder        Int           @default(0)
+  publishedAt      DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  deletedAt        DateTime?
+
+  teamMembers         TeamMember[]
+  categories          Category[]
+  relatedPublications Publication[] @relation("AreaRelatedPublications")
+
+  @@index([status, sortOrder])
+  @@index([deletedAt])
+}
+
+model TeamMember {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  fullName       String
+  title          String
+  photoId        String?
+  photo          Media?        @relation("TeamPhoto", fields: [photoId], references: [id], onDelete: SetNull)
+  // CSS object-position değeri (örn. "50% 20%") — portre kadrajı için.
+  photoPosition  String        @default("50% 25%")
+  shortBio       String        @default("")
+  bio            String        @default("")
+  education      String[]
+  barAssociation String?
+  tbbNo          String?
+  barNo          String?
+  careerStart    DateTime?     @db.Date
+  languages      String[]
+  writings       String[]
+  email          String?
+  linkedin       String?
+  // Profilde gizlenecek bölümlerin anahtarları (education, barInfo, languages, writings, email, careerStart, practiceAreas)
+  hiddenFields   String[]
+  seoTitle       String?
+  seoDescription String?
+  status         ContentStatus @default(DRAFT)
+  sortOrder      Int           @default(0)
+  publishedAt    DateTime?
+  isDemo         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  practiceAreas PracticeArea[]
+  publications  Publication[]
+
+  @@index([status, sortOrder])
+  @@index([deletedAt])
+}
+
+model Category {
+  id             String        @id @default(cuid())
+  name           String
+  slug           String        @unique
+  description    String?
+  sortOrder      Int           @default(0)
+  practiceAreaId String?
+  practiceArea   PracticeArea? @relation(fields: [practiceAreaId], references: [id], onDelete: SetNull)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  publications Publication[]
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  publications Publication[]
+}
+
+model Publication {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  excerpt        String        @default("")
+  content        String        @default("")
+  // Arama için düz metin (Türkçe karakterleri sadeleştirilmiş, küçük harf).
+  searchText     String        @default("")
+  coverId        String?
+  cover          Media?        @relation("PubCover", fields: [coverId], references: [id], onDelete: SetNull)
+  categoryId     String?
+  category       Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  authorId       String?
+  author         TeamMember?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorName     String?
+  featured       Boolean       @default(false)
+  readingMinutes Int           @default(1)
+  seoTitle       String?
+  seoDescription String?
+  ogImageId      String?
+  ogImage        Media?        @relation("PubOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+  status         ContentStatus @default(DRAFT)
+  publishedAt    DateTime?
+  isDemo         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  tags         Tag[]
+  relatedAreas PracticeArea[] @relation("AreaRelatedPublications")
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+// Düzenlenebilir sayfalar: home, about, kvkk, cookies, privacy, terms
+model Page {
+  key            String    @id
+  title          String
+  content        String    @default("")
+  data           Json      @default("{}")
+  seoTitle       String?
+  seoDescription String?
+  ogImageId      String?
+  ogImage        Media?    @relation("PageOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+  // Hukuk metinleri için: LRN Hukuk'un metni kontrol edip onayladığı tarih.
+  reviewedAt     DateTime?
+  updatedAt      DateTime  @updatedAt
+  updatedById    String?
+}
+
+// Tek satırlık site ayarları (id = "site")
+model SiteSetting {
+  id                     String   @id @default("site")
+  firmName               String   @default("LRN Hukuk")
+  logoId                 String?
+  logo                   Media?   @relation("SiteLogo", fields: [logoId], references: [id], onDelete: SetNull)
+  faviconId              String?
+  favicon                Media?   @relation("SiteFavicon", fields: [faviconId], references: [id], onDelete: SetNull)
+  ogImageId              String?
+  ogImage                Media?   @relation("SiteOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+  phone                  String   @default("")
+  email                  String   @default("")
+  address                String   @default("")
+  mapEmbedUrl            String   @default("")
+  workingHours           String   @default("")
+  linkedin               String   @default("")
+  instagram              String   @default("")
+  x                      String   @default("")
+  facebook               String   @default("")
+  footerText             String   @default("")
+  defaultTitle           String   @default("")
+  defaultDescription     String   @default("")
+  gaMeasurementId        String   @default("")
+  googleSiteVerification String   @default("")
+  publicationDisclaimer  String   @default("")
+  contactNotice          String   @default("")
+  contactConsentLabel    String   @default("")
+  contactRecipientEmail  String   @default("")
+  storeContactMessages   Boolean  @default(true)
+  messageRetentionDays   Int      @default(365)
+  updatedAt              DateTime @updatedAt
+  updatedById            String?
+}
+
+// ───────────────────────── İletişim & sistem ─────────────────────────
+
+model ContactMessage {
+  id         String    @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  subject    String
+  message    String
+  consentAt  DateTime
+  emailSent  Boolean   @default(false)
+  read       Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  // Saklama süresi dolduğunda otomatik silinir (SiteSetting.messageRetentionDays).
+  purgeAfter DateTime?
+
+  @@index([createdAt])
+  @@index([purgeAfter])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userEmail String?
+  action    String
+  entity    String?
+  entityId  String?
+  meta      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+}
+
+// Sabit pencereli hız sınırlama sayaçları (Redis gerektirmez; sunucusuz ortamlarda da çalışır).
+model RateLimit {
+  key         String   @id
+  count       Int
+  windowStart DateTime @default(now())
+
+  @@index([windowStart])
+}
