@@ -1,21 +1,21 @@
 # Devir notu — bu proje burada kaldı
 
-Bu dosya, projeyi Claude Code ile devralacak kişi için yazıldı. Ayrıntılı teknik dokümantasyon
-[`README.md`](README.md) içinde (35+ bölüm); proje kuralları [`AGENTS.md`](AGENTS.md) içinde
-(Claude Code bunu otomatik okur, tekrar anlatmaya gerek yok). Bu notun amacı **nerede kalındığını**
+Bu dosya, projeyi devralacak kişi için yazıldı. Ayrıntılı teknik dokümantasyon
+[`README.md`](README.md) içinde (35+ bölüm); proje kuralları ve mimari özeti
+[`PROJE-KURALLARI.md`](PROJE-KURALLARI.md) içinde. Bu notun amacı **nerede kalındığını**
 ve **sırada ne olduğunu** hızlıca özetlemek.
 
 ## Proje nedir
 
 Ankara merkezli LRN Hukuk için kurumsal web sitesi + yönetim paneli. Next.js 16 + TypeScript +
-PostgreSQL/Prisma 7 + Tailwind 4. Kaynak: orijinal brief'in tamamı `AGENTS.md`'nin başındaki
+PostgreSQL/Prisma 7 + Tailwind 4. Kaynak: orijinal brief'in tamamı `PROJE-KURALLARI.md` içindeki
 projeye özgü kurallarda özetlendi; reklam dili yasağı, gerçek kişi/telefon/adres uydurmama gibi
 **değişmez kurallara** özellikle dikkat edin — bunlar müşterinin (avukatlık meslek kuralları
 nedeniyle) ısrarla istediği kısıtlamalar.
 
 ## Şu ana kadar ne yapıldı (git geçmişi)
 
-`git log --oneline` ile 6 commit görürsünüz — her biri gerçek bir aşama, hiçbiri kaybolmadı:
+`git log --oneline` ile tüm aşamaları görürsünüz — her biri gerçek bir aşama, hiçbiri kaybolmadı:
 
 1. **Sürüm 1** — İlk tam site + panel: 7 çalışma alanı, sınırsız ekip profili, yayınlar, iletişim
    formu, KVKK/çerez, güvenli admin (2FA, rol, denetim günlüğü), tüm testler. Sade/editoryal tasarım.
@@ -26,7 +26,7 @@ nedeniyle) ısrarla istediği kısıtlamalar.
    üzerine **gerçek ana tasarım** buraya oturdu: ivory/charcoal/bordo renk kimliği, mimari kapak +
    ara bölüm (stok fotoğraf yerine soyut yer tutucu), çalışma alanları için editoryal satır listesi
    (kart ızgarası değil), koyu "Yaklaşımımız" bölümü, kısıtlı hareket (her bölüm kaydırmada uçmuyor),
-   "AI şablon" hissi veren her şeyin (gradient/glassmorphism/badge/pill/aşırı yuvarlak köşe) temizlenmesi.
+   "hazır şablon" hissi veren her şeyin (gradient/glassmorphism/badge/pill/aşırı yuvarlak köşe) temizlenmesi.
 4. **İngilizce sürüm** (`4995efd`, en son commit) — `/en` altında **tam** İngilizce site: menü, footer,
    form, çerez bildirimi, 7 çalışma alanının tam çevirisi, dil değiştirici, hreflang, site haritası.
    Yayınlar (blog) kasıtlı olarak yalnızca Türkçe (bkz. README → "Çok dilli site").
@@ -57,7 +57,7 @@ npm run dev
 yayın; "Demo İçerik" etiketiyle işaretli, gerçek içerik girilmeden önce `npm run db:seed:demo:clear`
 ile temizlenmeli).
 
-**Not:** Bu oturumda kullanılan yerel admin hesabı (`yonetici@ornek.test`) ve embedded PostgreSQL
+**Not:** Geliştirme sırasında kullanılan yerel admin hesabı (`yonetici@ornek.test`) ve embedded PostgreSQL
 verisi zip'e dahil DEĞİL (`.pgdata`, `node_modules`, `.next` hariç tutuldu — hepsi yeniden
 üretilebilir). Sıfırdan kurulum gerekiyor, yukarıdaki adımlar yeterli.
 
@@ -84,7 +84,7 @@ Son durumda: lint/typecheck temiz, **91 birim+entegrasyon testi** ve **55 duman 
   * `npm run admin:create -- --email ... --reset` ile giriş yapıp "Yayına hazırlık" listesini
   (panel ana sayfası) takip edin — eksik olan her şeyi tek yerde gösterir.
 - **Gerçek isim/telefon/adres/sicil no yok** — 3 ekip profili hâlâ "Demo Profil Bir/İki/Üç" yer
-  tutucusu. Gerçek bilgiler yalnızca panelden, **uydurmadan** girilmeli (AGENTS.md kuralı).
+  tutucusu. Gerçek bilgiler yalnızca panelden, **uydurmadan** girilmeli (PROJE-KURALLARI.md kuralı).
 - **Yayınlar (blog) yalnızca Türkçe** — İngilizce çok dilli genişletme isteniyorsa `lib/i18n/`
   altındaki mimari zaten buna hazır (bkz. README → "Çok dilli site" bölümündeki mimari özeti),
   ama gerçek makale çevirisi otomatik üretilmedi (kalite/güvenilirlik nedeniyle bilinçli tercih).
@@ -94,15 +94,9 @@ Son durumda: lint/typecheck temiz, **91 birim+entegrasyon testi** ve **55 duman 
 
 ## Teslim edilen ek dosyalar (bu klasörün dışında, müşteriye ayrıca gönderildi)
 
-Bu oturumda müşteriye offline/sunum amaçlı birkaç dosya da üretildi (proje klasörünün dışında,
+Geliştirme sürecinde müşteriye offline/sunum amaçlı birkaç dosya da üretildi (proje klasörünün dışında,
 zip'e dahil değil): bir tanıtım PDF'i, çevrimdışı statik site kopyası ve tüm sayfaların tek tek
 göründüğü bir katalog PDF'i. Bunlar **artık güncel değil** (o zamanki sade tasarımı gösteriyorlardı,
 bu proje o zamandan beri kökten değişti — premium yeniden tasarım + İngilizce sürüm eklendi).
 Güncellenmiş bir sunum/offline paket gerekiyorsa `scripts/export-offline.mjs` betiği ve README →
 ilgili notlar başlangıç noktası olabilir; sıfırdan yeniden üretilmesi gerekir.
-
-## Claude Code ile devam etmek için
-
-Bu klasörde `claude` çalıştırmanız yeterli — `CLAUDE.md` (→ `AGENTS.md`'ye yönlendirir) otomatik
-okunur, proje kuralları ve mimari bilgisi bağlama otomatik yüklenir. Yeni bir isteğe başlamadan önce
-Claude'a bu dosyayı ("DEVIR-NOTU.md") okumasını söylemeniz yeterli, gerisini oradan alır.
